@@ -13,7 +13,6 @@ class AVQueuePlayerPrevious : AVQueuePlayer {
     
     public var nowPlayingIndex = 0
     public var playlist: NSMutableArray = NSMutableArray()
-    var isCalledFromPlayPreviousItem = false
     
     override init() {
         super.init()
