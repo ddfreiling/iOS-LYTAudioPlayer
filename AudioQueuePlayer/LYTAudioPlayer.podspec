@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "LYTAudioPlayer"
-  s.version      = "0.0.2"
+  s.version      = "0.0.3"
   s.summary      = "AudioPlayer developed on top of AVAudioQueuePlayer for the LYT project"
   s.description  = <<-DESC
                    Abstraction on top of AVAudioQueuePlayer with support for full playlist navigation, pre-buffering for gapless playback, interruption handling and NowPlayingInfo.
