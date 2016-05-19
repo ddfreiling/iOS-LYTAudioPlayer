@@ -278,7 +278,7 @@
 				INFOPLIST_FILE = AudioQueuePlayerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayerDemo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AudioQueuePlayerDemo;
 			};
 			name = Debug;
 		};
@@ -293,7 +293,7 @@
 				INFOPLIST_FILE = AudioQueuePlayerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayerDemo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AudioQueuePlayerDemo;
 			};
 			name = Release;
 		};

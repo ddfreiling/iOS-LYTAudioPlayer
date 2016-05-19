@@ -1,5 +1,5 @@
 //
-//  Player.swift
+//  LYTPlayer.swift
 //  AudioQueuePlayer
 //
 //  Created by Lyt on 10/05/16.
@@ -21,17 +21,17 @@ public enum AudioQueuePlayerState {
 }
 extension AudioQueuePlayerState: Equatable { }
 
-public protocol PlayerDelegate: NSObjectProtocol {
-    func audioPlayer(audioPlayer: Player, didChangeStateFrom from: AudioQueuePlayerState, toState to: AudioQueuePlayerState)
-    func audioPlayer(audioPlayer: Player, didFinishPlayingItem item: AudioTrack)
-    func audioPlayer(audioPlayer: Player, didFindDuration duration: Double, forTrack track: AudioTrack)
-    func audioPlayer(audioPlayer: Player, didUpdateBuffering buffered: Double, forTrack track: AudioTrack)
-    func audioPlayer(audioPlayer: Player, didBeginPlaybackForTrack track: AudioTrack)
-    func audioPlayer(audioPlayer: Player, didFinishSeekingToTime time: CMTime)
-    func audioPlayer(audioPlayer: Player, didEncounterError error:NSError)
+public protocol LYTPlayerDelegate: NSObjectProtocol {
+    func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: AudioQueuePlayerState, toState to: AudioQueuePlayerState)
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingItem item: AudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: AudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: AudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didBeginPlaybackForTrack track: AudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: CMTime)
+    func audioPlayer(audioPlayer: LYTPlayer, didEncounterError error:NSError)
 }
 
-@objc public class Player : NSObject {
+@objc public class LYTPlayer : NSObject {
     
     var audioPlayer = AVQueuePlayer()
     var authorizationFailedCallback: Callback?
@@ -40,9 +40,9 @@ public protocol PlayerDelegate: NSObjectProtocol {
     
     let observerManager = ObserverManager() // For KVO - see: https://github.com/timbodeit/ObserverManager
     
-    public weak var delegate: PlayerDelegate?
+    public weak var delegate: LYTPlayerDelegate?
     
-    public static let sharedInstance = Player()
+    public static let sharedInstance = LYTPlayer()
     
     private override init() {
         super.init()
@@ -80,7 +80,7 @@ public protocol PlayerDelegate: NSObjectProtocol {
         
         // Verify that we are ready to play....
         if ( audioPlayer.status == .ReadyToPlay ) {
-            NSLog("Player is READY")
+            NSLog("LYTPlayer is READY")
             if let status = audioPlayer.currentItem?.status {
                 switch status  {
                 case AVPlayerItemStatus.ReadyToPlay :
@@ -91,16 +91,16 @@ public protocol PlayerDelegate: NSObjectProtocol {
                     NSLog("CurrentItem is in an unknown state...")
                 }
             } else {
-                NSLog("Player currentItem is in trouble: \(audioPlayer.currentItem.debugDescription)")
+                NSLog("LYTPlayer currentItem is in trouble: \(audioPlayer.currentItem.debugDescription)")
             }
         } else {
-            NSLog("*** Player is NOT READY : \(audioPlayer.error?.localizedDescription) ***")
+            NSLog("*** LYTPlayer is NOT READY : \(audioPlayer.error?.localizedDescription) ***")
         }
         
         pausedByAudioSessionInterrupt = false
         setupAudioActive(true)
         audioPlayer.play()
-        NSLog("Player.play() status: \(currentStatus() )")
+        NSLog("LYTPlayer.play() status: \(currentStatus() )")
         state = AudioQueuePlayerState.Playing
     }
     
@@ -169,9 +169,9 @@ public protocol PlayerDelegate: NSObjectProtocol {
             try audioSession.setCategory(AVAudioSessionCategoryPlayback)
             try audioSession.setActive(active, withOptions: .NotifyOthersOnDeactivation ) // ??? Options
             
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(Player.audioSessionInterrupted), name: AVAudioSessionInterruptionNotification, object: audioSession)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LYTPlayer.audioSessionInterrupted), name: AVAudioSessionInterruptionNotification, object: audioSession)
             
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(Player.audioSessionRouteChanged), name: AVAudioSessionRouteChangeNotification, object: audioSession)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LYTPlayer.audioSessionRouteChanged), name: AVAudioSessionRouteChangeNotification, object: audioSession)
             return true
         } catch {
             NSLog("Error setting AudioSession !!!!!!!!!")
@@ -258,7 +258,7 @@ public protocol PlayerDelegate: NSObjectProtocol {
     }
     
     func finishedPlayingItem() {
-        // Player finished playing track and will automatically start playing the next
+        // LYTPlayer finished playing track and will automatically start playing the next
         // Notify delegate and update the index of currently played track
         if let currentTrack = self.currentPlaylist?.tracks[currentPlaylistIndex] {
             self.delegate?.audioPlayer(self, didFinishPlayingItem: currentTrack)
@@ -336,18 +336,18 @@ public protocol PlayerDelegate: NSObjectProtocol {
         audioPlayer.whenChanging("status", manager: observerManager) { player in
             switch( player.status) {
             case .Failed :
-                NSLog("*** Player Failed!")
+                NSLog("*** LYTPlayer Failed!")
             case .ReadyToPlay :
-                NSLog("+++ Player is ready to play!")
+                NSLog("+++ LYTPlayer is ready to play!")
             case .Unknown :
-                NSLog("??? Player is in UNKNOWN state ???")
+                NSLog("??? LYTPlayer is in UNKNOWN state ???")
             }
             
             self.updateNowPlayingInfo()
         }
         audioPlayer.whenChanging("rate", manager: observerManager) { player in
             let playingState = ( player.rate > 0 ? "Playing" : "Paused")
-            NSLog("==> Got new rate \(player.rate) - Player is \(playingState)" )
+            NSLog("==> Got new rate \(player.rate) - LYTPlayer is \(playingState)" )
             self.updateNowPlayingInfo()
         }
     }

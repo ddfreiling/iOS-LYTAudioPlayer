@@ -12,7 +12,7 @@
 		442718791CE1CD40008428E3 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442718781CE1CD40008428E3 /* Playlist.swift */; };
 		4427187B1CE1CD4E008428E3 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4427187A1CE1CD4E008428E3 /* AudioTrack.swift */; };
 		4427187D1CE1D790008428E3 /* HelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4427187C1CE1D790008428E3 /* HelperFunctions.swift */; };
-		4427187F1CE1D8CD008428E3 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4427187E1CE1D8CD008428E3 /* Player.swift */; };
+		4427187F1CE1D8CD008428E3 /* LYTPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4427187E1CE1D8CD008428E3 /* LYTPlayer.swift */; };
 		4441D8651CE219690075F08C /* ObjectMapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4441D8581CE219580075F08C /* ObjectMapper.framework */; };
 		446BA8051CE5D05D00449947 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446BA8041CE5D05D00449947 /* Reachability.swift */; };
 		446BA8111CEB206F00449947 /* AVQueuePlayerPrevious.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446BA8101CEB206F00449947 /* AVQueuePlayerPrevious.swift */; };
@@ -79,11 +79,12 @@
 		442718781CE1CD40008428E3 /* Playlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
 		4427187A1CE1CD4E008428E3 /* AudioTrack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
 		4427187C1CE1D790008428E3 /* HelperFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperFunctions.swift; sourceTree = "<group>"; };
-		4427187E1CE1D8CD008428E3 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		4427187E1CE1D8CD008428E3 /* LYTPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LYTPlayer.swift; sourceTree = "<group>"; };
 		4441D84D1CE219570075F08C /* ObjectMapper.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectMapper.xcodeproj; path = Carthage/Checkouts/ObjectMapper/ObjectMapper.xcodeproj; sourceTree = SOURCE_ROOT; };
 		446BA8041CE5D05D00449947 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		446BA8101CEB206F00449947 /* AVQueuePlayerPrevious.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVQueuePlayerPrevious.swift; sourceTree = "<group>"; };
 		446BA8121CEC553800449947 /* MyPlayerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPlayerItem.swift; sourceTree = "<group>"; };
+		44E1C3D71CEDB115000A740C /* LYTAudioPlayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LYTAudioPlayer.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +102,7 @@
 		4427185D1CE0B40D008428E3 = {
 			isa = PBXGroup;
 			children = (
+				44E1C3D71CEDB115000A740C /* LYTAudioPlayer.podspec */,
 				4441D84D1CE219570075F08C /* ObjectMapper.xcodeproj */,
 				442718691CE0B40D008428E3 /* AudioQueuePlayer */,
 				442718681CE0B40D008428E3 /* Products */,
@@ -124,7 +126,7 @@
 				442718781CE1CD40008428E3 /* Playlist.swift */,
 				4427187A1CE1CD4E008428E3 /* AudioTrack.swift */,
 				4427187C1CE1D790008428E3 /* HelperFunctions.swift */,
-				4427187E1CE1D8CD008428E3 /* Player.swift */,
+				4427187E1CE1D8CD008428E3 /* LYTPlayer.swift */,
 				446BA8041CE5D05D00449947 /* Reachability.swift */,
 				446BA8101CEB206F00449947 /* AVQueuePlayerPrevious.swift */,
 				446BA8121CEC553800449947 /* MyPlayerItem.swift */,
@@ -286,7 +288,7 @@
 				442718771CE0BFC9008428E3 /* ObserverManager.swift in Sources */,
 				446BA8051CE5D05D00449947 /* Reachability.swift in Sources */,
 				4427187B1CE1CD4E008428E3 /* AudioTrack.swift in Sources */,
-				4427187F1CE1D8CD008428E3 /* Player.swift in Sources */,
+				4427187F1CE1D8CD008428E3 /* LYTPlayer.swift in Sources */,
 				446BA8111CEB206F00449947 /* AVQueuePlayerPrevious.swift in Sources */,
 				442718791CE1CD40008428E3 /* Playlist.swift in Sources */,
 				446BA8131CEC553800449947 /* MyPlayerItem.swift in Sources */,
@@ -404,7 +406,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayer;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AudioQueuePlayer;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -428,7 +430,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayer;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AudioQueuePlayer;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -21,7 +21,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var btnPlay: UIButton!
     @IBOutlet weak var imageView: UIImageView!
     
-    var player: Player!
+    var player: LYTAudioPlayer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,7 +46,7 @@ class ViewController: UIViewController {
                 title: "title", artist: "artist", album: "album", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         
         
-        player = Player.sharedInstance
+        player = LYTAudioPlayer.sharedInstance
         player.loadPlaylist(myPlaylist)
     }
 
