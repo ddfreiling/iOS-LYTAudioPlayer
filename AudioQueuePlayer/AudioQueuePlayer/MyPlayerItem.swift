@@ -22,7 +22,7 @@ class MyPlayerItem : AVPlayerItem {
         subscribeToNotificationsAndObservers()
     }
     
-    public func subscribeToNotificationsAndObservers() {
+    internal func subscribeToNotificationsAndObservers() {
         //self.addObserver(self, forKeyPath: kLoadedTimeRangesKey, options: , context: &myContext)
     }
 }

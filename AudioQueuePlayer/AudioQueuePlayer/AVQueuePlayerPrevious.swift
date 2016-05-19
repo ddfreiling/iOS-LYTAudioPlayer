@@ -9,7 +9,7 @@
 import Foundation
 import AVFoundation
 
-class AVQueuePlayerPrevious : AVQueuePlayer {
+public class AVQueuePlayerPrevious : AVQueuePlayer {
     
     public var nowPlayingIndex = 0
     public var playlist: NSMutableArray = NSMutableArray()
@@ -45,12 +45,10 @@ class AVQueuePlayerPrevious : AVQueuePlayer {
             let tmpPlaylist = NSMutableArray(array: playlist)
             self.removeAllItems()
             
-            isCalledFromPlayPreviousItem = true
             let newQueueRange = NSRange(location: tmpNowPlayingIndex - 1, length: playlist.count - tmpNowPlayingIndex)
             for item in tmpPlaylist.subarrayWithRange(newQueueRange) as! [AVPlayerItem] {
                 self.insertItem(item, afterItem: nil)
             }
-            isCalledFromPlayPreviousItem = false
             
             nowPlayingIndex = tmpNowPlayingIndex - 1
             self.seekToTime(kCMTimeZero)
@@ -71,25 +69,25 @@ class AVQueuePlayerPrevious : AVQueuePlayer {
     
     //MARK: --- Overridden AVQueuePlayer methods
     
-    override func removeAllItems() {
+    public override func removeAllItems() {
         super.removeAllItems()
         nowPlayingIndex = 0
         playlist.removeAllObjects()
     }
     
-    override func removeItem(item: AVPlayerItem) {
+    public override func removeItem(item: AVPlayerItem) {
         super.removeItem(item)
         let curItem = playlist[nowPlayingIndex]
         playlist.removeObject(item)
         nowPlayingIndex = playlist.indexOfObject(curItem)
     }
     
-    override func advanceToNextItem() {
+    public override func advanceToNextItem() {
         super.advanceToNextItem()
         onAdvancedToNextItem()
     }
     
-    override func insertItem(item: AVPlayerItem, afterItem: AVPlayerItem?) {
+    public override func insertItem(item: AVPlayerItem, afterItem: AVPlayerItem?) {
         super.insertItem(item, afterItem: afterItem)
         let curItem = playlist[nowPlayingIndex]
         

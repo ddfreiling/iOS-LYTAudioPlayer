@@ -11,22 +11,22 @@ import AudioToolbox
 import AVFoundation
 import MediaPlayer
 
-public enum AudioQueuePlayerState {
-    case Buffering
-    case Playing
-    case Paused
-    case Stopped
-    case WaitingForConnection
-    case Failed
+@objc public enum LYTPlayerState : UInt {
+    case Buffering = 0
+    case Playing = 1
+    case Paused = 2
+    case Stopped = 3
+    case WaitingForConnection = 4
+    case Failed = 5
 }
-extension AudioQueuePlayerState: Equatable { }
+extension LYTPlayerState: Equatable { }
 
-public protocol LYTPlayerDelegate: NSObjectProtocol {
-    func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: AudioQueuePlayerState, toState to: AudioQueuePlayerState)
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingItem item: AudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: AudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: AudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didBeginPlaybackForTrack track: AudioTrack)
+@objc public protocol LYTPlayerDelegate: NSObjectProtocol {
+    func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: LYTPlayerState, toState to: LYTPlayerState)
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingItem item: LYTAudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: LYTAudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: LYTAudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didBeginPlaybackForTrack track: LYTAudioTrack)
     func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: CMTime)
     func audioPlayer(audioPlayer: LYTPlayer, didEncounterError error:NSError)
 }
@@ -35,7 +35,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
     
     var audioPlayer = AVQueuePlayer()
     var authorizationFailedCallback: Callback?
-    var currentPlaylist: Playlist?
+    var currentPlaylist: LYTPlaylist?
     var currentPlaylistIndex: Int = 0
     
     let observerManager = ObserverManager() // For KVO - see: https://github.com/timbodeit/ObserverManager
@@ -46,7 +46,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
     
     private override init() {
         super.init()
-        state = AudioQueuePlayerState.Stopped
+        state = LYTPlayerState.Stopped
         audioPlayer.actionAtItemEnd = .Advance
         configureRemoteControlEvents()
     }
@@ -58,7 +58,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
     // MARK: Readonly properties
     
     /// The current state of the player.
-    public private(set) var state = AudioQueuePlayerState.Stopped {
+    public private(set) var state = LYTPlayerState.Stopped {
         didSet {
             if state != oldValue || state == .WaitingForConnection {
                 delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
@@ -68,7 +68,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
     
     // MARK: Public API
     
-    public func loadPlaylist(playlist: Playlist) {
+    public func loadPlaylist(playlist: LYTPlaylist) {
         currentPlaylist = playlist
         currentPlaylistIndex = 0;
         setupCurrentAudioPart(currentPlaylistIndex, success: { NSLog("setup success") })
@@ -101,7 +101,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
         setupAudioActive(true)
         audioPlayer.play()
         NSLog("LYTPlayer.play() status: \(currentStatus() )")
-        state = AudioQueuePlayerState.Playing
+        state = LYTPlayerState.Playing
     }
     
     func currentStatus() -> String {
@@ -116,7 +116,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
         audioPlayer.pause()
         // TODO: Register where we are so can continue where we stopped.
         setupAudioActive(false)
-        state = AudioQueuePlayerState.Paused
+        state = LYTPlayerState.Paused
     }
     
     public func stop() {
@@ -124,7 +124,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
         audioPlayer.pause() // AVPlayer does not have a stop method
         self.observerManager.deregisterAllObservers()
         self.audioPlayer.removeAllItems()
-        state = AudioQueuePlayerState.Stopped
+        state = LYTPlayerState.Stopped
     }
     
     public func isPlaying() -> Bool
@@ -157,7 +157,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
         })
     }
     
-    public func currentTrack() -> AudioTrack? {
+    public func currentTrack() -> LYTAudioTrack? {
         return currentPlaylist?.tracks[currentPlaylistIndex]
     }
     
@@ -212,7 +212,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
     func setupPlayerItemObservers(item: AVPlayerItem, itemPlaylistIndex: Int) {
         NSNotificationCenter.defaultCenter()
             .addObserver(self, selector: #selector(finishedPlayingItem), name: AVPlayerItemDidPlayToEndTimeNotification, object: item)
-        let itemTrack: AudioTrack = self.currentPlaylist!.tracks[itemPlaylistIndex]
+        let itemTrack: LYTAudioTrack = self.currentPlaylist!.tracks[itemPlaylistIndex]
         item.whenChanging("status", manager: observerManager ) { item in
             switch item.status {
             case .Failed:
@@ -270,7 +270,7 @@ public protocol LYTPlayerDelegate: NSObjectProtocol {
     func updateNowPlayingInfo() {
         guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         NSLog("\(#function)...")
-        let currentTrack: AudioTrack = currentPlaylist.tracks[currentPlaylistIndex]
+        let currentTrack: LYTAudioTrack = currentPlaylist.tracks[currentPlaylistIndex]
         
         NSLog("Updating NowPlayingInfo for: \(currentTrack.title)")
         let infoCenter = MPNowPlayingInfoCenter.defaultCenter()

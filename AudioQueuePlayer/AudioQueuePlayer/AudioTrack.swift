@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class AudioTrack {
+@objc public class LYTAudioTrack : NSObject {
     
     public var url: NSURL
     public var title: String

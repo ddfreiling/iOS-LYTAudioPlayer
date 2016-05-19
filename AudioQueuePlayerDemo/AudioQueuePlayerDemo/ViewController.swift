@@ -21,32 +21,32 @@ class ViewController: UIViewController {
     @IBOutlet weak var btnPlay: UIButton!
     @IBOutlet weak var imageView: UIImageView!
     
-    var player: LYTAudioPlayer!
+    var player: LYTPlayer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         //UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
         // Do any additional setup after loading the view, typically from a nib.
         
-        let myPlaylist = Playlist()
+        let myPlaylist = LYTPlaylist()
         myPlaylist.addTrack(
-            AudioTrack(url: NSURL(string:"http://www.noiseaddicts.com/samples_1w72b820/3714.mp3")!,
+            LYTAudioTrack(url: NSURL(string:"http://www.noiseaddicts.com/samples_1w72b820/3714.mp3")!,
                 title: "Intro Sound", artist: "Artist", album: "Intro", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         myPlaylist.addTrack(
-            AudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-01.mp3")!,
+            LYTAudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-01.mp3")!,
                 title: "Skyggeforbandelsen", artist: "Helene Tegtmeier", album: "Del 1 af 3", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         myPlaylist.addTrack(
-            AudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-02.mp3")!,
+            LYTAudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-02.mp3")!,
                 title: "Skyggeforbandelsen", artist: "Helene Tegtmeier", album: "Del 2 af 3", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         myPlaylist.addTrack(
-            AudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-03.mp3")!,
+            LYTAudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-03.mp3")!,
                 title: "Skyggeforbandelsen", artist: "Helene Tegtmeier", album: "Del 3 af 3", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         myPlaylist.addTrack(
-            AudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-04.mp3")!,
+            LYTAudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-04.mp3")!,
                 title: "title", artist: "artist", album: "album", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         
         
-        player = LYTAudioPlayer.sharedInstance
+        player = LYTPlayer.sharedInstance
         player.loadPlaylist(myPlaylist)
     }
 
