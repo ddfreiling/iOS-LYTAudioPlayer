@@ -24,9 +24,9 @@ extension AudioQueuePlayerState: Equatable { }
 public protocol PlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: Player, didChangeStateFrom from: AudioQueuePlayerState, toState to: AudioQueuePlayerState)
     func audioPlayer(audioPlayer: Player, didFinishPlayingItem item: AudioTrack)
-    func audioPlayer(audioPlayer: Player, didFindDuration duration: NSTimeInterval, forTrack track: AudioTrack)
+    func audioPlayer(audioPlayer: Player, didFindDuration duration: Double, forTrack track: AudioTrack)
+    func audioPlayer(audioPlayer: Player, didUpdateBuffering buffered: Double, forTrack track: AudioTrack)
     func audioPlayer(audioPlayer: Player, didBeginPlaybackForTrack track: AudioTrack)
-    func audioPlayer(audioPlayer: Player, didUpdateTrackLoadedTimeRange loadedTimeRange: CMTimeRange)
     func audioPlayer(audioPlayer: Player, didFinishSeekingToTime time: CMTime)
     func audioPlayer(audioPlayer: Player, didEncounterError error:NSError)
 }
@@ -212,6 +212,7 @@ public protocol PlayerDelegate: NSObjectProtocol {
     func setupPlayerItemObservers(item: AVPlayerItem, itemPlaylistIndex: Int) {
         NSNotificationCenter.defaultCenter()
             .addObserver(self, selector: #selector(finishedPlayingItem), name: AVPlayerItemDidPlayToEndTimeNotification, object: item)
+        let itemTrack: AudioTrack = self.currentPlaylist!.tracks[itemPlaylistIndex]
         item.whenChanging("status", manager: observerManager ) { item in
             switch item.status {
             case .Failed:
@@ -222,7 +223,7 @@ public protocol PlayerDelegate: NSObjectProtocol {
                 if (nextPlaylistIndex < self.currentPlaylist?.trackCount) {
                     self.addItemToPlayerQueue(nextPlaylistIndex)
                 }
-                self.delegate?.audioPlayer(self, didFindDuration: item.duration.seconds, forTrack: (self.currentPlaylist?.tracks[itemPlaylistIndex])!)
+                self.delegate?.audioPlayer(self, didFindDuration: item.duration.seconds, forTrack: itemTrack)
             case .Unknown :
                 NSLog("--> PlayerItem UNKNOWN status: \(item.asset.debugDescription)")
             }
@@ -243,19 +244,29 @@ public protocol PlayerDelegate: NSObjectProtocol {
             }
         }
         item.whenChanging("loadedTimeRanges", manager: observerManager) { item in
-            NSLog("___loadedTimeRanges changed___")
-            
+            let durationLoaded = self.durationLoadedOfItem(item)
+            NSLog("___loadedTimeRanges changed: \(durationLoaded)")
+            self.delegate?.audioPlayer(self, didUpdateBuffering: durationLoaded, forTrack: itemTrack)
         }
+    }
+    
+    func durationLoadedOfItem(item: AVPlayerItem) -> Double {
+        NSLog("-> Item has \(item.loadedTimeRanges.count) time ranges");
+        let timeRange: CMTimeRange = item.loadedTimeRanges[0].CMTimeRangeValue
+        let loadedDuration: Double = CMTimeGetSeconds(timeRange.duration)
+        return loadedDuration
     }
     
     func finishedPlayingItem() {
         // Player finished playing track and will automatically start playing the next
-        // update the index of currently played track and notify delegate
+        // Notify delegate and update the index of currently played track
+        if let currentTrack = self.currentPlaylist?.tracks[currentPlaylistIndex] {
+            self.delegate?.audioPlayer(self, didFinishPlayingItem: currentTrack)
+        }
         self.currentPlaylistIndex += 1
-        self.delegate?.audioPlayer(self, didFinishPlayingItem: (self.currentPlaylist?.tracks[currentPlaylistIndex])!)
     }
     
-    // Now playing info is showed on the lock screen and the controll center.
+    // Now playing info is showed on the lock screen and the control center.
     func updateNowPlayingInfo() {
         guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         NSLog("\(#function)...")
@@ -279,6 +290,7 @@ public protocol PlayerDelegate: NSObjectProtocol {
         }
         infoCenter.nowPlayingInfo = info
         
+        // Set artwork image async
         guard let imageUrl = currentTrack.albumArtUrl where currentTrack.albumArtCachedImage == nil else {
             NSLog("==> No album artwork url specified or already cached")
             return
@@ -298,9 +310,6 @@ public protocol PlayerDelegate: NSObjectProtocol {
             })
             NSLog("=== ARTWORK IMAGE SET ===")
         })
-        
-        //TODO: Get UIImage from albumArtworkUrl async
-        // see http://stackoverflow.com/questions/24130821/mpnowplayinginfocenter-what-is-the-best-way-to-set-mpmediaitemartwork-from-an
     }
     
     func getArtworkImageFromUrl(imageUrlPath: String) -> UIImage? {
@@ -352,9 +361,12 @@ public protocol PlayerDelegate: NSObjectProtocol {
     // Called whenever we get interrupted (by f.ex. phone call, Alarm clock, etc.)
     func audioSessionInterrupted(notification: NSNotification)
     {
-        let interruptDict: NSDictionary = notification.userInfo!
-        let interruptType = interruptDict[AVAudioSessionInterruptionTypeKey]!.unsignedIntegerValue as! AVAudioSessionInterruptionType
-        NSLog("*** AVAudioSessionInterruption received: \(interruptType)")
+        guard let interruptTypeRaw = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let interruptType = AVAudioSessionInterruptionType(rawValue: interruptTypeRaw) else {
+                NSLog("*** AVAudioSessionInterruption: no type argument found")
+                return
+        }
+        NSLog("*** AVAudioSessionInterruption: \(interruptType)")
         
         switch interruptType {
         case .Began:
@@ -370,16 +382,19 @@ public protocol PlayerDelegate: NSObjectProtocol {
         }
     }
     
-    // Called whenever we the audio route is changed (f.ex. switch to headset og AirPlay) // TODO: Check up on this.
+    // Called whenever we the audio route is changed (f.ex. switch to headset og AirPlay)
     // https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/HandlingAudioHardwareRouteChanges/HandlingAudioHardwareRouteChanges.html#//apple_ref/doc/uid/TP40007875-CH5-SW1
     func audioSessionRouteChanged(notification: NSNotification)
     {
-        // TODO: Deal with route change - Unplug headset should pause audio (according to Apple HIG)
-        let routeChangeDict: NSDictionary = notification.userInfo!
-        let reason = routeChangeDict[AVAudioSessionRouteChangeReasonKey]!.unsignedIntegerValue as! AVAudioSessionRouteChangeReason
-        NSLog("*** AVAudioSessionRouteChangen received: \(reason)")
+        // Unplug headset should pause audio (according to Apple HIG)
+        guard let routeChangeRaw = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+            let routeChange = AVAudioSessionRouteChangeReason(rawValue: routeChangeRaw) else {
+                NSLog("*** AVAudioSessionInterruption: no type argument found")
+                return
+        }
+        NSLog("*** AVAudioSessionRouteChange: \(routeChange)")
         
-        if (reason != .CategoryChange) {
+        if (routeChange != .CategoryChange) {
             self.pause()
         }
     }

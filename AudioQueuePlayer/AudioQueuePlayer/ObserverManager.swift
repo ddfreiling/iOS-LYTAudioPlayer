@@ -127,6 +127,8 @@ import MediaPlayer
 
 // TODO: Add generics .........
 
+// TODO: Move out into Helpers
+
 typealias QueuePlayerObserver = (AVQueuePlayer) -> ()
 extension AVQueuePlayer {
     func whenChanging(property: String, manager: ObserverManager = ObserverManager.sharedInstance, then callback: QueuePlayerObserver ) {
