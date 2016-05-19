@@ -17,7 +17,7 @@
 		446BA8051CE5D05D00449947 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446BA8041CE5D05D00449947 /* Reachability.swift */; };
 		446BA8111CEB206F00449947 /* AVQueuePlayerPrevious.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446BA8101CEB206F00449947 /* AVQueuePlayerPrevious.swift */; };
 		446BA8131CEC553800449947 /* MyPlayerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446BA8121CEC553800449947 /* MyPlayerItem.swift */; };
-		44A2CD141CEDC46B00A0CE6B /* LYTAudioPlayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 44A2CD131CEDC46B00A0CE6B /* LYTAudioPlayer.podspec */; };
+		44A2CD161CEDC90F00A0CE6B /* LYTAudioPlayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 44A2CD151CEDC90F00A0CE6B /* LYTAudioPlayer.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,7 +85,7 @@
 		446BA8041CE5D05D00449947 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		446BA8101CEB206F00449947 /* AVQueuePlayerPrevious.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVQueuePlayerPrevious.swift; sourceTree = "<group>"; };
 		446BA8121CEC553800449947 /* MyPlayerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPlayerItem.swift; sourceTree = "<group>"; };
-		44A2CD131CEDC46B00A0CE6B /* LYTAudioPlayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LYTAudioPlayer.podspec; path = ../LYTAudioPlayer.podspec; sourceTree = "<group>"; };
+		44A2CD151CEDC90F00A0CE6B /* LYTAudioPlayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LYTAudioPlayer.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,7 +103,7 @@
 		4427185D1CE0B40D008428E3 = {
 			isa = PBXGroup;
 			children = (
-				44A2CD131CEDC46B00A0CE6B /* LYTAudioPlayer.podspec */,
+				44A2CD151CEDC90F00A0CE6B /* LYTAudioPlayer.podspec */,
 				4441D84D1CE219570075F08C /* ObjectMapper.xcodeproj */,
 				442718691CE0B40D008428E3 /* AudioQueuePlayer */,
 				442718681CE0B40D008428E3 /* Products */,
@@ -275,7 +275,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44A2CD141CEDC46B00A0CE6B /* LYTAudioPlayer.podspec in Resources */,
+				44A2CD161CEDC90F00A0CE6B /* LYTAudioPlayer.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
