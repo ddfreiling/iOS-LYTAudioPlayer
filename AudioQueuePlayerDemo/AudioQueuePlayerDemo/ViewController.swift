@@ -79,20 +79,22 @@ class ViewController: UIViewController, LYTPlayerDelegate {
     
     @IBAction func onSeekClicked(sender: UIButton) {
         NSLog("Seek Clicked")
-        let time: Int = player.currentTime()
-        NSLog("CurrentTime: \(time)")
-        player.seekToTimeMilis(10000)
+        player.skipToPlaylistIndex(3, onCompletion: {
+            NSLog("===========> Skip completed")
+        })
+        self.player.seekToTimeMilis(10000, onCompletion: {
+            NSLog("===========> Seek completed");
+        })
     }
     
     @IBAction func onStopClicked(sender: UIButton) {
         NSLog("Stop Clicked")
-        //player.stop()
-        player.skipToPlaylistIndex(3)
+        player.stop()
     }
     
     @IBAction func onShowImageClicked(sender: UIButton) {
         NSLog("ShowImage Clicked")
-        if let track = player.currentTrack() {
+        if let track = player.currentTrack {
             if let image = track.albumArtCachedImage {
                 NSLog("== View received cached image: (width) %f", image.size.width)
                 imageView.image = track.albumArtCachedImage
