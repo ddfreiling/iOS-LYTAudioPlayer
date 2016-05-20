@@ -12,7 +12,6 @@ import Foundation
 import UIKit
 
 // Convenience types and functions .......
-typealias Callback = () -> ()
 
 // -------------------------------------------------------------------------------------
 // MARK: - UI Related helpers

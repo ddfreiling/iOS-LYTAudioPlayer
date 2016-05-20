@@ -21,6 +21,8 @@ import MediaPlayer
 }
 extension LYTPlayerState: Equatable { }
 
+public typealias Callback = () -> Void
+
 @objc public protocol LYTPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: LYTPlayerState, toState to: LYTPlayerState)
     func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingTrack track: LYTAudioTrack)
