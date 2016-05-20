@@ -159,20 +159,22 @@ public typealias Callback = () -> Void
         }
     }
     
-    public func seekToTimeMilis(timeMilis: Int) {
+    public func seekToTimeMilis(timeMilis: Int, onCompletion: Callback) {
         let newTime: CMTime = CMTimeMake(Int64(timeMilis), 1000)
-        audioPlayer.seekToTime(newTime, completionHandler: { _ in
+        audioPlayer.seekToTime(newTime) { success in
+            onCompletion()
             self.delegate?.audioPlayer(self, didFinishSeekingToTime: newTime.seconds)
-        })
+        }
     }
     
-    public func skipToPlaylistIndex(index: Int) {
+    public func skipToPlaylistIndex(index: Int, onCompletion: Callback) {
         if (index < 0 || index >= currentPlaylist?.trackCount) {
             NSLog("\(#function) Invalid playlist index given: \(index)")
             return
         }
         setupCurrentPlaylistIndex(index) {
             self.play()
+            onCompletion()
         }
     }
     
