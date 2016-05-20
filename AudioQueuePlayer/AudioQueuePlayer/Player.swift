@@ -38,7 +38,7 @@ public typealias Callback = () -> Void
     var audioPlayer = AVQueuePlayer()
     var authorizationFailedCallback: Callback?
     var currentPlaylist: LYTPlaylist?
-    var currentPlaylistIndex: Int = 0
+    public var currentPlaylistIndex: Int = 0
     
     let observerManager = ObserverManager() // For KVO - see: https://github.com/timbodeit/ObserverManager
     
