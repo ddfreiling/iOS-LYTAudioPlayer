@@ -16,7 +16,7 @@ import AudioQueuePlayer
 // https://github.com/NoonPacific/NPAudioStream
 // https://github.com/delannoyk/AudioPlayer
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, LYTPlayerDelegate {
 
     @IBOutlet weak var btnPlay: UIButton!
     @IBOutlet weak var imageView: UIImageView!
@@ -47,7 +47,8 @@ class ViewController: UIViewController {
         
         
         player = LYTPlayer.sharedInstance
-        player.loadPlaylist(myPlaylist)
+        player.delegate = self;
+        player.loadPlaylist(myPlaylist, andAutoplay: false)
     }
 
     override func didReceiveMemoryWarning() {
@@ -80,12 +81,13 @@ class ViewController: UIViewController {
         NSLog("Seek Clicked")
         let time: Int = player.currentTime()
         NSLog("CurrentTime: \(time)")
-        player.seekTo(10000, playlistIndex: 0)
+        player.seekToTimeMilis(10000)
     }
     
     @IBAction func onStopClicked(sender: UIButton) {
         NSLog("Stop Clicked")
-        player.stop()
+        //player.stop()
+        player.skipToPlaylistIndex(3)
     }
     
     @IBAction func onShowImageClicked(sender: UIButton) {
@@ -98,6 +100,28 @@ class ViewController: UIViewController {
                 NSLog("== View did not receive any album artwork image")
             }
         }
+    }
+    
+    func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: LYTPlayerState, toState to: LYTPlayerState) {
+        NSLog("Delegate: state-change: \(from.rawValue) -> \(to.rawValue)")
+    }
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingTrack track: LYTAudioTrack) {
+        NSLog("Delegate: finish item: \(track.title)")
+    }
+    func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: LYTAudioTrack) {
+        NSLog("Delegate: duration found for item \(track.title) = \(duration)")
+    }
+    func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: LYTAudioTrack) {
+        NSLog("Delegate: buffered: \(track.title) >> \(buffered)s")
+    }
+    func audioPlayer(audioPlayer: LYTPlayer, didChangeToTrack track: LYTAudioTrack) {
+        NSLog("Delegate: changed current track: \(track.title)")
+    }
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: Double) {
+        NSLog("Delegate: finished seeking to \(time)");
+    }
+    func audioPlayer(audioPlayer: LYTPlayer, didEncounterError error:NSError) {
+        NSLog("Delegate: ERROR! \(error.localizedDescription)");
     }
 }
 

@@ -23,11 +23,11 @@ extension LYTPlayerState: Equatable { }
 
 @objc public protocol LYTPlayerDelegate: NSObjectProtocol {
     func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: LYTPlayerState, toState to: LYTPlayerState)
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingItem item: LYTAudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingTrack track: LYTAudioTrack)
     func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: LYTAudioTrack)
     func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: LYTAudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didBeginPlaybackForTrack track: LYTAudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: CMTime)
+    func audioPlayer(audioPlayer: LYTPlayer, didChangeToTrack track: LYTAudioTrack)
+    func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: Double)
     func audioPlayer(audioPlayer: LYTPlayer, didEncounterError error:NSError)
 }
 
@@ -68,10 +68,14 @@ extension LYTPlayerState: Equatable { }
     
     // MARK: Public API
     
-    public func loadPlaylist(playlist: LYTPlaylist) {
+    public func loadPlaylist(playlist: LYTPlaylist, andAutoplay autoplay: Bool) {
         currentPlaylist = playlist
         currentPlaylistIndex = 0;
-        setupCurrentAudioPart(currentPlaylistIndex, success: { NSLog("setup success") })
+        setupCurrentPlaylistIndex(currentPlaylistIndex, success: {
+            if (autoplay) {
+                self.play()
+            }
+        })
     }
     
     public func play() {
@@ -122,8 +126,9 @@ extension LYTPlayerState: Equatable { }
     public func stop() {
         NSLog("\(#function)...")
         audioPlayer.pause() // AVPlayer does not have a stop method
-        self.observerManager.deregisterAllObservers()
-        self.audioPlayer.removeAllItems()
+        observerManager.deregisterAllObservers()
+        audioPlayer.removeAllItems()
+        currentPlaylistIndex = 0
         state = LYTPlayerState.Stopped
     }
     
@@ -136,25 +141,35 @@ extension LYTPlayerState: Equatable { }
         guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         if ( currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
             stop()
-            setupCurrentAudioPart( currentPlaylistIndex + 1) { self.play() }
+            setupCurrentPlaylistIndex( currentPlaylistIndex + 1) { self.play() }
         } else {
             stop()
         }
     }
     
     public func previousAudioTrack() {
-        setupCurrentAudioPart( max(currentPlaylistIndex - 1, 0) ) { self.play() }
+        setupCurrentPlaylistIndex( max(currentPlaylistIndex - 1, 0) ) { self.play() }
     }
     
     public func currentTime() -> Int {
         return lround(audioPlayer.currentTime().seconds * 1000)
     }
     
-    public func seekTo(time: Int, playlistIndex: Int?) {
-        let newTime: CMTime = CMTimeMake(Int64(time), 1000)
+    public func seekToTimeMilis(timeMilis: Int) {
+        let newTime: CMTime = CMTimeMake(Int64(timeMilis), 1000)
         audioPlayer.seekToTime(newTime, completionHandler: { _ in
-            self.delegate?.audioPlayer(self, didFinishSeekingToTime: newTime)
+            self.delegate?.audioPlayer(self, didFinishSeekingToTime: newTime.seconds)
         })
+    }
+    
+    public func skipToPlaylistIndex(index: Int) {
+        if (index < 0 || index >= currentPlaylist?.trackCount) {
+            NSLog("\(#function) Invalid playlist index given: \(index)")
+            return
+        }
+        setupCurrentPlaylistIndex(index) {
+            self.play()
+        }
     }
     
     public func currentTrack() -> LYTAudioTrack? {
@@ -187,7 +202,7 @@ extension LYTPlayerState: Equatable { }
         setupAudioActive(false)
     }
     
-    func setupCurrentAudioPart(playlistIndex: Int = 0, success: () -> () = {} ) {
+    func setupCurrentPlaylistIndex(playlistIndex: Int = 0, success: () -> () = {} ) {
         guard let _ = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         NSLog("setupCurrentAudioPart( \(playlistIndex)) ...")
         self.stop()
@@ -198,7 +213,7 @@ extension LYTPlayerState: Equatable { }
         success()
     }
     
-    /// Added a player item for a given part to the play queue, and setup observers to automatically schedule the following parts.
+    // Adds a player item for a given playlist index to the play queue, and setup observers to automatically schedule the next.
     func addItemToPlayerQueue( playlistIndex: Int ) {
         guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         let track = currentPlaylist.tracks[playlistIndex]
@@ -245,7 +260,7 @@ extension LYTPlayerState: Equatable { }
         }
         item.whenChanging("loadedTimeRanges", manager: observerManager) { item in
             let durationLoaded = self.durationLoadedOfItem(item)
-            NSLog("___loadedTimeRanges changed: \(durationLoaded)")
+            NSLog(">> loaded duration: \(durationLoaded)")
             self.delegate?.audioPlayer(self, didUpdateBuffering: durationLoaded, forTrack: itemTrack)
         }
     }
@@ -261,7 +276,7 @@ extension LYTPlayerState: Equatable { }
         // LYTPlayer finished playing track and will automatically start playing the next
         // Notify delegate and update the index of currently played track
         if let currentTrack = self.currentPlaylist?.tracks[currentPlaylistIndex] {
-            self.delegate?.audioPlayer(self, didFinishPlayingItem: currentTrack)
+            self.delegate?.audioPlayer(self, didFinishPlayingTrack: currentTrack)
         }
         self.currentPlaylistIndex += 1
     }
@@ -332,6 +347,9 @@ extension LYTPlayerState: Equatable { }
         audioPlayer.whenChanging("currentItem", manager: observerManager) { player in
             NSLog("==> AudioPlayer new current item \(player.currentItem?.asset.debugDescription)")
             self.updateNowPlayingInfo()
+            if let currentTrack: LYTAudioTrack = self.currentPlaylist?.tracks[self.currentPlaylistIndex] {
+                self.delegate?.audioPlayer(self, didChangeToTrack: currentTrack)
+            }
         }
         audioPlayer.whenChanging("status", manager: observerManager) { player in
             switch( player.status) {
