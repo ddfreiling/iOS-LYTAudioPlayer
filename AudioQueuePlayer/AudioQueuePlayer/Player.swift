@@ -153,8 +153,10 @@ public typealias Callback = () -> Void
         setupCurrentPlaylistIndex( max(currentPlaylistIndex - 1, 0) ) { self.play() }
     }
     
-    public func currentTime() -> Int {
-        return lround(audioPlayer.currentTime().seconds * 1000)
+    public var currentTime: Int {
+        get {
+            return lround(audioPlayer.currentTime().seconds * 1000)
+        }
     }
     
     public func seekToTimeMilis(timeMilis: Int) {
