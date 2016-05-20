@@ -43,7 +43,6 @@ public typealias Callback = () -> Void
     let observerManager = ObserverManager() // For KVO - see: https://github.com/timbodeit/ObserverManager
     
     public weak var delegate: LYTPlayerDelegate?
-    
     public static let sharedInstance = LYTPlayer()
     
     private override init() {
@@ -134,11 +133,6 @@ public typealias Callback = () -> Void
         state = LYTPlayerState.Stopped
     }
     
-    public func isPlaying() -> Bool
-    {
-        return (audioPlayer.rate > 0.0);
-    }
-    
     public func nextAudioTrack() {
         guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         if ( currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
@@ -178,9 +172,43 @@ public typealias Callback = () -> Void
         }
     }
     
-    public func currentTrack() -> LYTAudioTrack? {
+    public var isPlaying: Bool {
+        get {
+            return (audioPlayer.rate > 0.0)
+        }
+    }
+    
+    public var playbackRate: Float {
+        get {
+            return audioPlayer.rate;
+        }
+        set {
+            if (0 < newValue && newValue <= 2) {
+                audioPlayer.rate = newValue;
+            } else {
+                NSLog("invalid rate: \(newValue)");
+            }
+        }
+    }
+    
+    public var currentTrack: LYTAudioTrack? {
         return currentPlaylist?.tracks[currentPlaylistIndex]
     }
+    
+    public var currentTrackDuration: Double {
+        get {
+            if let item = self.audioPlayer.currentItem {
+                return item.duration.seconds
+            } else {
+                return -1
+            }
+        }
+    }
+    
+    
+    
+    
+    // MARK: Private
     
     // Return true if succesful.
     func setupAudioActive(active: Bool) -> Bool {
@@ -266,7 +294,6 @@ public typealias Callback = () -> Void
         }
         item.whenChanging("loadedTimeRanges", manager: observerManager) { item in
             let durationLoaded = self.durationLoadedOfItem(item)
-            NSLog(">> loaded duration: \(durationLoaded)")
             self.delegate?.audioPlayer(self, didUpdateBuffering: durationLoaded, forTrack: itemTrack)
         }
     }
@@ -398,7 +425,7 @@ public typealias Callback = () -> Void
             self.pause()
             break
         case .Ended:
-            if (!self.isPlaying() && pausedByAudioSessionInterrupt) {
+            if (!self.isPlaying && pausedByAudioSessionInterrupt) {
                 self.play()
                 pausedByAudioSessionInterrupt = false
             }
@@ -446,7 +473,7 @@ public typealias Callback = () -> Void
         // Headset remote sends this signal on single click .....
         commandCenter.togglePlayPauseCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("togglePlayPauseCommand \(event.description)")
-            if ( self.isPlaying() ) {
+            if ( self.isPlaying ) {
                 self.pause()
             } else {
                 self.play()
