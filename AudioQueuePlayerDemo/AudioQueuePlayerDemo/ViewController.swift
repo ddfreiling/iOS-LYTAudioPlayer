@@ -84,6 +84,7 @@ class ViewController: UIViewController, LYTPlayerDelegate {
         })
         self.player.seekToTimeMilis(10000, onCompletion: {
             NSLog("===========> Seek completed");
+            self.player.play()
         })
     }
     
@@ -104,25 +105,22 @@ class ViewController: UIViewController, LYTPlayerDelegate {
         }
     }
     
-    func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: LYTPlayerState, toState to: LYTPlayerState) {
+    func didChangeStateFrom(from: LYTPlayerState, to: LYTPlayerState) {
         NSLog("Delegate: state-change: \(from.rawValue) -> \(to.rawValue)")
     }
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingTrack track: LYTAudioTrack) {
+    func didFinishPlayingTrack(track: LYTAudioTrack) {
         NSLog("Delegate: finish item: \(track.title)")
     }
-    func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: LYTAudioTrack) {
+    func didFindDuration(duration: Double, forTrack track: LYTAudioTrack) {
         NSLog("Delegate: duration found for item \(track.title) = \(duration)")
     }
-    func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: LYTAudioTrack) {
+    func didUpdateBufferedDuration(buffered: Double, forTrack track: LYTAudioTrack) {
         NSLog("Delegate: buffered: \(track.title) >> \(buffered)s")
     }
-    func audioPlayer(audioPlayer: LYTPlayer, didChangeToTrack track: LYTAudioTrack) {
+    func didChangeToTrack(track: LYTAudioTrack) {
         NSLog("Delegate: changed current track: \(track.title)")
     }
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: Double) {
-        NSLog("Delegate: finished seeking to \(time)");
-    }
-    func audioPlayer(audioPlayer: LYTPlayer, didEncounterError error:NSError) {
+    func didEncounterError(error:NSError) {
         NSLog("Delegate: ERROR! \(error.localizedDescription)");
     }
 }

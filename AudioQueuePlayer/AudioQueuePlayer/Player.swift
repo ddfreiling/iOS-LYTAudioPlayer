@@ -24,13 +24,12 @@ extension LYTPlayerState: Equatable { }
 public typealias Callback = () -> Void
 
 @objc public protocol LYTPlayerDelegate: NSObjectProtocol {
-    func audioPlayer(audioPlayer: LYTPlayer, didChangeStateFrom from: LYTPlayerState, toState to: LYTPlayerState)
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishPlayingTrack track: LYTAudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didFindDuration duration: Double, forTrack track: LYTAudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didUpdateBuffering buffered: Double, forTrack track: LYTAudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didChangeToTrack track: LYTAudioTrack)
-    func audioPlayer(audioPlayer: LYTPlayer, didFinishSeekingToTime time: Double)
-    func audioPlayer(audioPlayer: LYTPlayer, didEncounterError error:NSError)
+    func didChangeStateFrom( from: LYTPlayerState, to: LYTPlayerState )
+    func didFinishPlayingTrack( track: LYTAudioTrack )
+    func didFindDuration( durationSeconds: Double, forTrack track: LYTAudioTrack )
+    func didUpdateBufferedDuration( bufferedDuration: Double, forTrack track: LYTAudioTrack )
+    func didChangeToTrack( track: LYTAudioTrack )
+    func didEncounterError( error: NSError )
 }
 
 @objc public class LYTPlayer : NSObject {
@@ -62,12 +61,47 @@ public typealias Callback = () -> Void
     public private(set) var state = LYTPlayerState.Stopped {
         didSet {
             if state != oldValue || state == .WaitingForConnection {
-                delegate?.audioPlayer(self, didChangeStateFrom: oldValue, toState: state)
+                delegate?.didChangeStateFrom(oldValue, to: state)
+            }
+        }
+    }
+    
+    public var isPlaying: Bool {
+        get {
+            return (audioPlayer.rate > 0.0)
+        }
+    }
+    
+    public var currentTrack: LYTAudioTrack? {
+        get {
+            return currentPlaylist?.tracks[currentPlaylistIndex]
+        }
+    }
+    
+    public var currentTrackDuration: Double {
+        get {
+            if let item = self.audioPlayer.currentItem {
+                return item.duration.seconds
+            } else {
+                return -1
             }
         }
     }
     
     // MARK: Public API
+    
+    public var playbackRate: Float {
+        get {
+            return audioPlayer.rate;
+        }
+        set {
+            if (0.5 <= newValue && newValue <= 2) {
+                audioPlayer.rate = newValue;
+            } else {
+                NSLog("invalid rate: \(newValue). Must be between 0.5 and 2.0");
+            }
+        }
+    }
     
     public func loadPlaylist(playlist: LYTPlaylist, andAutoplay autoplay: Bool) {
         currentPlaylist = playlist
@@ -156,8 +190,8 @@ public typealias Callback = () -> Void
     public func seekToTimeMilis(timeMilis: Int, onCompletion: Callback) {
         let newTime: CMTime = CMTimeMake(Int64(timeMilis), 1000)
         audioPlayer.seekToTime(newTime) { success in
+            self.updateNowPlayingInfo()
             onCompletion()
-            self.delegate?.audioPlayer(self, didFinishSeekingToTime: newTime.seconds)
         }
     }
     
@@ -169,39 +203,6 @@ public typealias Callback = () -> Void
         setupCurrentPlaylistIndex(index) {
             self.play()
             onCompletion()
-        }
-    }
-    
-    public var isPlaying: Bool {
-        get {
-            return (audioPlayer.rate > 0.0)
-        }
-    }
-    
-    public var playbackRate: Float {
-        get {
-            return audioPlayer.rate;
-        }
-        set {
-            if (0 < newValue && newValue <= 2) {
-                audioPlayer.rate = newValue;
-            } else {
-                NSLog("invalid rate: \(newValue)");
-            }
-        }
-    }
-    
-    public var currentTrack: LYTAudioTrack? {
-        return currentPlaylist?.tracks[currentPlaylistIndex]
-    }
-    
-    public var currentTrackDuration: Double {
-        get {
-            if let item = self.audioPlayer.currentItem {
-                return item.duration.seconds
-            } else {
-                return -1
-            }
         }
     }
     
@@ -253,7 +254,7 @@ public typealias Callback = () -> Void
         let track = currentPlaylist.tracks[playlistIndex]
         NSLog("Add to Queue: \(track.url.lastPathComponent) from URL: \(track.url)")
         let asset = AVURLAsset(URL: track.url)
-        let item = AVPlayerItem.init(asset: asset, automaticallyLoadedAssetKeys: ["duration","playable","tracks"]) // Asset keys that need to be present before the item is 'ready'
+        let item = AVPlayerItem.init(asset: asset, automaticallyLoadedAssetKeys: ["duration","playable","tracks"]) // Asset keys that need to be present before the item is considered 'ready'
         self.setupPlayerItemObservers(item, itemPlaylistIndex: playlistIndex)
         self.audioPlayer.insertItem(item, afterItem: nil) // append item to player queue
     }
@@ -272,7 +273,7 @@ public typealias Callback = () -> Void
                 if (nextPlaylistIndex < self.currentPlaylist?.trackCount) {
                     self.addItemToPlayerQueue(nextPlaylistIndex)
                 }
-                self.delegate?.audioPlayer(self, didFindDuration: item.duration.seconds, forTrack: itemTrack)
+                self.delegate?.didFindDuration(item.duration.seconds, forTrack: itemTrack)
             case .Unknown :
                 NSLog("--> PlayerItem UNKNOWN status: \(item.asset.debugDescription)")
             }
@@ -288,13 +289,13 @@ public typealias Callback = () -> Void
                 } else {
                     NSLog("*** UNHANDLED ERROR !!!! ***")
                     // TODO: Deal with other item errors .......
-                    self.delegate?.audioPlayer(self, didEncounterError: error)
+                    self.delegate?.didEncounterError(error)
                 }
             }
         }
         item.whenChanging("loadedTimeRanges", manager: observerManager) { item in
             let durationLoaded = self.durationLoadedOfItem(item)
-            self.delegate?.audioPlayer(self, didUpdateBuffering: durationLoaded, forTrack: itemTrack)
+            self.delegate?.didUpdateBufferedDuration(durationLoaded, forTrack: itemTrack)
         }
     }
     
@@ -309,7 +310,7 @@ public typealias Callback = () -> Void
         // LYTPlayer finished playing track and will automatically start playing the next
         // Notify delegate and update the index of currently played track
         if let currentTrack = self.currentPlaylist?.tracks[currentPlaylistIndex] {
-            self.delegate?.audioPlayer(self, didFinishPlayingTrack: currentTrack)
+            self.delegate?.didFinishPlayingTrack(currentTrack)
         }
         self.currentPlaylistIndex += 1
     }
@@ -381,7 +382,7 @@ public typealias Callback = () -> Void
             NSLog("==> AudioPlayer new current item \(player.currentItem?.asset.debugDescription)")
             self.updateNowPlayingInfo()
             if let currentTrack: LYTAudioTrack = self.currentPlaylist?.tracks[self.currentPlaylistIndex] {
-                self.delegate?.audioPlayer(self, didChangeToTrack: currentTrack)
+                self.delegate?.didChangeToTrack(currentTrack)
             }
         }
         audioPlayer.whenChanging("status", manager: observerManager) { player in
@@ -433,14 +434,14 @@ public typealias Callback = () -> Void
         }
     }
     
-    // Called whenever we the audio route is changed (f.ex. switch to headset og AirPlay)
+    // Called whenever the audio route is changed (f.ex. switch to headset og AirPlay)
     // https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/HandlingAudioHardwareRouteChanges/HandlingAudioHardwareRouteChanges.html#//apple_ref/doc/uid/TP40007875-CH5-SW1
     func audioSessionRouteChanged(notification: NSNotification)
     {
         // Unplug headset should pause audio (according to Apple HIG)
         guard let routeChangeRaw = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
             let routeChange = AVAudioSessionRouteChangeReason(rawValue: routeChangeRaw) else {
-                NSLog("*** AVAudioSessionInterruption: no type argument found")
+                NSLog("*** AVAudioSessionRouteChange: no reason argument found")
                 return
         }
         NSLog("*** AVAudioSessionRouteChange: \(routeChange)")
