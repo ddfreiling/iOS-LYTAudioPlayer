@@ -31,7 +31,7 @@ public class AVQueuePlayerPrevious : AVQueuePlayer {
         self.playlist = NSMutableArray(array: items)
         for item in items {
             NSNotificationCenter.defaultCenter()
-                .addObserver(self, selector: #selector(onAdvancedToNextItem), name: AVPlayerItemDidPlayToEndTimeNotification, object: item)
+                .addObserver(self, selector: #selector(onDidPlayToEnd), name: AVPlayerItemDidPlayToEndTimeNotification, object: item)
         }
     }
     
@@ -60,7 +60,7 @@ public class AVQueuePlayerPrevious : AVQueuePlayer {
         return nowPlayingIndex == 0
     }
     
-    func onAdvancedToNextItem() {
+    func onDidPlayToEndTime() {
         if (nowPlayingIndex < playlist.count - 1) {
             nowPlayingIndex += 1
         }
@@ -84,7 +84,7 @@ public class AVQueuePlayerPrevious : AVQueuePlayer {
     
     public override func advanceToNextItem() {
         super.advanceToNextItem()
-        onAdvancedToNextItem()
+        onDidPlayToEnd()
     }
     
     public override func insertItem(item: AVPlayerItem, afterItem: AVPlayerItem?) {
