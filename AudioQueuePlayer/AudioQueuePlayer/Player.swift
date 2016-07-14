@@ -173,28 +173,29 @@ public typealias Callback = () -> Void
         }
     }
     
-    public func nextAudioTrack(onCompletion: Callback? = nil) {
+    public func nextAudioTrack(onCompletion: Callback) {
         onSerialQueue({
             guard let currentPlaylist = self.currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
             if ( self.currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
                 self.stopPlayback()
                 let newPlaylistIndex = self.currentPlaylistIndex + 1
                 NSLog("====> Skip to \(newPlaylistIndex)");
-                self.setupCurrentPlaylistIndex( newPlaylistIndex ) { self.play() }
+                self.setupCurrentPlaylistIndex( newPlaylistIndex ) {
+                    self.play()
+                    onCompletion()
+                }
             } else {
                 self.stopPlayback(true)
-            }
-            if (onCompletion != nil) {
-                onCompletion!()
+                onCompletion()
             }
         })
     }
     
-    public func previousAudioTrack(onCompletion: Callback? = nil) {
+    public func previousAudioTrack(onCompletion: Callback) {
         onSerialQueue({
-            self.setupCurrentPlaylistIndex( max(self.currentPlaylistIndex - 1, 0) ) { self.play() }
-            if (onCompletion != nil) {
-                onCompletion!();
+            self.setupCurrentPlaylistIndex( max(self.currentPlaylistIndex - 1, 0) ) {
+                self.play()
+                onCompletion()
             }
         })
     }
@@ -502,7 +503,7 @@ public typealias Callback = () -> Void
         
         commandCenter.previousTrackCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("previousTrackCommand \(event.description)")
-            self.previousAudioTrack()
+            self.previousAudioTrack() {}
             return .Success
         }
         commandCenter.previousTrackCommand.enabled = true
@@ -510,7 +511,7 @@ public typealias Callback = () -> Void
         // Can be sent by double-clicking on the headset remote
         commandCenter.nextTrackCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("nextTrackCommand \(event.description)")
-            self.nextAudioTrack()
+            self.nextAudioTrack() {}
             return .Success
         }
         commandCenter.nextTrackCommand.enabled = true

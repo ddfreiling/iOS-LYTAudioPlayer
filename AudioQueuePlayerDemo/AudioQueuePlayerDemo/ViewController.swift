@@ -69,12 +69,12 @@ class ViewController: UIViewController, LYTPlayerDelegate {
     
     @IBAction func onPreviousClicked(sender: UIButton) {
         NSLog("Previous Clicked")
-        player.previousAudioTrack()
+        player.previousAudioTrack() {}
     }
     
     @IBAction func onNextClicked(sender: UIButton) {
         NSLog("Next Clicked")
-        player.nextAudioTrack()
+        player.nextAudioTrack() {}
     }
     
     @IBAction func onSeekClicked(sender: UIButton) {
