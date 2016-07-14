@@ -212,15 +212,13 @@ public typealias Callback = () -> Void
     }
     
     public func skipToPlaylistIndex(index: Int, onCompletion: Callback) {
-        onSerialQueue({
-            if (index < 0 || index >= self.currentPlaylist?.trackCount) {
-                NSLog("\(#function) Invalid playlist index given: \(index)")
-                return
-            }
-            self.setupCurrentPlaylistIndex(index) {
-                onCompletion()
-            }
-        })
+        if (index < 0 || index >= self.currentPlaylist?.trackCount) {
+            NSLog("\(#function) Invalid playlist index given: \(index)")
+            return
+        }
+        self.setupCurrentPlaylistIndex(index) {
+            onCompletion()
+        }
     }
     
     
