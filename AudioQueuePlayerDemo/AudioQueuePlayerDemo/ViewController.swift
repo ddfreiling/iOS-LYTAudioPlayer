@@ -81,10 +81,10 @@ class ViewController: UIViewController, LYTPlayerDelegate {
         NSLog("Seek Clicked")
         player.skipToPlaylistIndex(3, onCompletion: {
             NSLog("===========> Skip completed")
-        })
-        self.player.seekToTimeMilis(10000, onCompletion: {
-            NSLog("===========> Seek completed");
-            self.player.play()
+            self.player.seekToTimeMilis(10000, onCompletion: {
+                NSLog("===========> Seek completed");
+                self.player.play()
+            })
         })
     }
     

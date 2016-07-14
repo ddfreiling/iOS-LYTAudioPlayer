@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/lyt/Code/ios-audioplayer/AudioQueuePlayerDemo/AudioQueuePlayerDemo.xcodeproj">
+      location = "group:/Users/dfg/Code/ios-audioplayer/AudioQueuePlayerDemo/AudioQueuePlayerDemo.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:/Users/lyt/Code/ios-audioplayer/AudioQueuePlayer/AudioQueuePlayer.xcodeproj">
+      location = "group:/Users/dfg/Code/ios-audioplayer/AudioQueuePlayer/AudioQueuePlayer.xcodeproj">
    </FileRef>
 </Workspace>

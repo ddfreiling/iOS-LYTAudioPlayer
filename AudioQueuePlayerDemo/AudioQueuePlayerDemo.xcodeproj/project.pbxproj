@@ -13,7 +13,6 @@
 		442718941CE1EAF6008428E3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 442718931CE1EAF6008428E3 /* Assets.xcassets */; };
 		442718971CE1EAF6008428E3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 442718951CE1EAF6008428E3 /* LaunchScreen.storyboard */; };
 		446BA80E1CE5D5C400449947 /* AudioQueuePlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */; };
-		446BA80F1CE5D5C900449947 /* AudioQueuePlayer.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,7 +22,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				446BA80F1CE5D5C900449947 /* AudioQueuePlayer.framework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -38,7 +36,7 @@
 		442718931CE1EAF6008428E3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		442718961CE1EAF6008428E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		442718981CE1EAF6008428E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioQueuePlayer.framework; path = "../../../Library/Developer/Xcode/DerivedData/ios-audioplayer-ecckzgxoovikwtewnbnduhluicfs/Build/Products/Debug-iphonesimulator/AudioQueuePlayer.framework"; sourceTree = "<group>"; };
+		446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioQueuePlayer.framework; path = "/Users/dfg/Library/Developer/Xcode/DerivedData/ios-audioplayer-ecckzgxoovikwtewnbnduhluicfs/Build/Products/Debug-iphonesimulator/AudioQueuePlayer.framework"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +54,6 @@
 		442718801CE1EAF6008428E3 = {
 			isa = PBXGroup;
 			children = (
-				446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */,
 				4427188B1CE1EAF6008428E3 /* AudioQueuePlayerDemo */,
 				4427188A1CE1EAF6008428E3 /* Products */,
 			);
@@ -271,6 +268,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -279,6 +278,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayerDemo;
 				PRODUCT_NAME = AudioQueuePlayerDemo;
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -286,6 +286,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -294,6 +296,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayerDemo;
 				PRODUCT_NAME = AudioQueuePlayerDemo;
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
