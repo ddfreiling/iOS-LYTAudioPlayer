@@ -37,6 +37,7 @@ public typealias Callback = () -> Void
     var audioPlayer = AVQueuePlayer()
     var authorizationFailedCallback: Callback?
     var currentPlaylist: LYTPlaylist?
+    
     public var currentPlaylistIndex: Int = 0
     
     let observerManager = ObserverManager() // For KVO - see: https://github.com/timbodeit/ObserverManager
@@ -52,7 +53,7 @@ public typealias Callback = () -> Void
     }
     
     deinit {
-        stop()
+        stopPlayback(true)
     }
     
     // MARK: Readonly properties
@@ -89,7 +90,6 @@ public typealias Callback = () -> Void
     }
     
     // MARK: Public API
-    
     public var playbackRate: Float {
         get {
             return audioPlayer.rate;
@@ -159,26 +159,44 @@ public typealias Callback = () -> Void
     }
     
     public func stop() {
+        self.stopPlayback(true);
+    }
+    
+    private func stopPlayback(fullstop: Bool = false) {
         NSLog("\(#function)...")
         audioPlayer.pause() // AVPlayer does not have a stop method
         observerManager.deregisterAllObservers()
         audioPlayer.removeAllItems()
-        currentPlaylistIndex = 0
         state = LYTPlayerState.Stopped
-    }
-    
-    public func nextAudioTrack() {
-        guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
-        if ( currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
-            stop()
-            setupCurrentPlaylistIndex( currentPlaylistIndex + 1) { self.play() }
-        } else {
-            stop()
+        if (fullstop) {
+            currentPlaylistIndex = 0;
         }
     }
     
-    public func previousAudioTrack() {
-        setupCurrentPlaylistIndex( max(currentPlaylistIndex - 1, 0) ) { self.play() }
+    public func nextAudioTrack(onCompletion: Callback? = nil) {
+        onSerialQueue({
+            guard let currentPlaylist = self.currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
+            if ( self.currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
+                self.stopPlayback()
+                let newPlaylistIndex = self.currentPlaylistIndex + 1
+                NSLog("====> Skip to \(newPlaylistIndex)");
+                self.setupCurrentPlaylistIndex( newPlaylistIndex ) { self.play() }
+            } else {
+                self.stopPlayback(true)
+            }
+            if (onCompletion != nil) {
+                onCompletion!()
+            }
+        })
+    }
+    
+    public func previousAudioTrack(onCompletion: Callback? = nil) {
+        onSerialQueue({
+            self.setupCurrentPlaylistIndex( max(self.currentPlaylistIndex - 1, 0) ) { self.play() }
+            if (onCompletion != nil) {
+                onCompletion!();
+            }
+        })
     }
     
     public var currentTime: Int {
@@ -188,6 +206,7 @@ public typealias Callback = () -> Void
     }
     
     public func seekToTimeMilis(timeMilis: Int, onCompletion: Callback) {
+        
         let newTime: CMTime = CMTimeMake(Int64(timeMilis), 1000)
         audioPlayer.seekToTime(newTime) { success in
             self.updateNowPlayingInfo()
@@ -196,17 +215,16 @@ public typealias Callback = () -> Void
     }
     
     public func skipToPlaylistIndex(index: Int, onCompletion: Callback) {
-        if (index < 0 || index >= currentPlaylist?.trackCount) {
-            NSLog("\(#function) Invalid playlist index given: \(index)")
-            return
-        }
-        setupCurrentPlaylistIndex(index) {
-            self.play()
-            onCompletion()
-        }
+        onSerialQueue({
+            if (index < 0 || index >= self.currentPlaylist?.trackCount) {
+                NSLog("\(#function) Invalid playlist index given: \(index)")
+                return
+            }
+            self.setupCurrentPlaylistIndex(index) {
+                onCompletion()
+            }
+        })
     }
-    
-    
     
     
     // MARK: Private
@@ -239,10 +257,10 @@ public typealias Callback = () -> Void
     
     func setupCurrentPlaylistIndex(playlistIndex: Int = 0, success: () -> () = {} ) {
         guard let _ = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
-        NSLog("setupCurrentAudioPart( \(playlistIndex)) ...")
-        self.stop()
+        NSLog("setupCurrentAudioPart(\(playlistIndex)) ...")
+        self.stopPlayback()
         self.setupAudioPlayerObservers()
-        NSLog("setupCurrentAudioPart() - audioPlayer Initialized ...")
+        NSLog("setupCurrentAudioPart(\(playlistIndex)) - audioPlayer Initialized ...")
         self.currentPlaylistIndex = playlistIndex
         addItemToPlayerQueue(self.currentPlaylistIndex)
         success()
@@ -356,8 +374,8 @@ public typealias Callback = () -> Void
                 NSLog("==> Setting MPMediaItemArtwork on main thread")
                 info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artworkImage)
                 infoCenter.nowPlayingInfo = info
+                NSLog("=== ARTWORK IMAGE SET ===")
             })
-            NSLog("=== ARTWORK IMAGE SET ===")
         })
     }
     
