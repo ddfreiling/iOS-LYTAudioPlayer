@@ -174,30 +174,26 @@ public typealias Callback = () -> Void
     }
     
     public func nextAudioTrack(onCompletion: Callback) {
-        onSerialQueue({
-            guard let currentPlaylist = self.currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
-            if ( self.currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
-                self.stopPlayback()
-                let newPlaylistIndex = self.currentPlaylistIndex + 1
-                NSLog("====> Skip to \(newPlaylistIndex)");
-                self.setupCurrentPlaylistIndex( newPlaylistIndex ) {
-                    self.play()
-                    onCompletion()
-                }
-            } else {
-                self.stopPlayback(true)
-                onCompletion()
-            }
-        })
-    }
-    
-    public func previousAudioTrack(onCompletion: Callback) {
-        onSerialQueue({
-            self.setupCurrentPlaylistIndex( max(self.currentPlaylistIndex - 1, 0) ) {
+        guard let currentPlaylist = self.currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
+        if ( self.currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
+            self.stopPlayback()
+            let newPlaylistIndex = self.currentPlaylistIndex + 1
+            NSLog("====> Skip to \(newPlaylistIndex)");
+            self.setupCurrentPlaylistIndex( newPlaylistIndex ) {
                 self.play()
                 onCompletion()
             }
-        })
+        } else {
+            self.stopPlayback(true)
+            onCompletion()
+        }
+    }
+    
+    public func previousAudioTrack(onCompletion: Callback) {
+        self.setupCurrentPlaylistIndex( max(self.currentPlaylistIndex - 1, 0) ) {
+            self.play()
+            onCompletion()
+        }
     }
     
     public var currentTime: Int {
