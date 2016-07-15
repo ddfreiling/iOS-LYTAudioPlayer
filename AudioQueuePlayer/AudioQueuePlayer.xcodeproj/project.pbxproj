@@ -15,6 +15,7 @@
 		4427187F1CE1D8CD008428E3 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4427187E1CE1D8CD008428E3 /* Player.swift */; };
 		4441D8651CE219690075F08C /* ObjectMapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4441D8581CE219580075F08C /* ObjectMapper.framework */; };
 		44A2CD161CEDC90F00A0CE6B /* LYTAudioPlayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 44A2CD151CEDC90F00A0CE6B /* LYTAudioPlayer.podspec */; };
+		BB1412471D38DE6500166457 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB1412461D38DE6500166457 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 		446BA8101CEB206F00449947 /* AVQueuePlayerPrevious.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVQueuePlayerPrevious.swift; sourceTree = "<group>"; };
 		446BA8121CEC553800449947 /* MyPlayerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyPlayerItem.swift; sourceTree = "<group>"; };
 		44A2CD151CEDC90F00A0CE6B /* LYTAudioPlayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LYTAudioPlayer.podspec; sourceTree = "<group>"; };
+		BB1412461D38DE6500166457 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB1412471D38DE6500166457 /* AVFoundation.framework in Frameworks */,
 				4441D8651CE219690075F08C /* ObjectMapper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -100,6 +103,7 @@
 		4427185D1CE0B40D008428E3 = {
 			isa = PBXGroup;
 			children = (
+				BB1412461D38DE6500166457 /* AVFoundation.framework */,
 				44A2CD151CEDC90F00A0CE6B /* LYTAudioPlayer.podspec */,
 				4441D84D1CE219570075F08C /* ObjectMapper.xcodeproj */,
 				442718691CE0B40D008428E3 /* AudioQueuePlayer */,
@@ -429,7 +433,6 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -456,7 +459,6 @@
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
 			name = Release;
 		};

@@ -12,16 +12,21 @@
 		442718921CE1EAF6008428E3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 442718901CE1EAF6008428E3 /* Main.storyboard */; };
 		442718941CE1EAF6008428E3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 442718931CE1EAF6008428E3 /* Assets.xcassets */; };
 		442718971CE1EAF6008428E3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 442718951CE1EAF6008428E3 /* LaunchScreen.storyboard */; };
-		446BA80E1CE5D5C400449947 /* AudioQueuePlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */; };
+		BB14124A1D38DEF200166457 /* AudioQueuePlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB1412481D38DE9D00166457 /* AudioQueuePlayer.framework */; };
+		BB14124B1D38DEF200166457 /* AudioQueuePlayer.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = BB1412481D38DE9D00166457 /* AudioQueuePlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BB14124D1D38DF3C00166457 /* ObjectMapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB14124C1D38DF3C00166457 /* ObjectMapper.framework */; };
+		BB14124E1D38DF3C00166457 /* ObjectMapper.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = BB14124C1D38DF3C00166457 /* ObjectMapper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		446BA8011CE5CE9A00449947 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				BB14124E1D38DF3C00166457 /* ObjectMapper.framework in Copy Files */,
+				BB14124B1D38DEF200166457 /* AudioQueuePlayer.framework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -36,7 +41,8 @@
 		442718931CE1EAF6008428E3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		442718961CE1EAF6008428E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		442718981CE1EAF6008428E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		446BA80D1CE5D5C400449947 /* AudioQueuePlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioQueuePlayer.framework; path = "/Users/dfg/Library/Developer/Xcode/DerivedData/ios-audioplayer-ecckzgxoovikwtewnbnduhluicfs/Build/Products/Debug-iphonesimulator/AudioQueuePlayer.framework"; sourceTree = "<absolute>"; };
+		BB1412481D38DE9D00166457 /* AudioQueuePlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioQueuePlayer.framework; path = "../../../Library/Developer/Xcode/DerivedData/ios-audioplayer-elibptipbciaypebvxssshlmjhem/Build/Products/Debug-iphoneos/AudioQueuePlayer.framework"; sourceTree = "<group>"; };
+		BB14124C1D38DF3C00166457 /* ObjectMapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = ObjectMapper.framework; path = "/Users/dfg/Library/Developer/Xcode/DerivedData/ios-audioplayer-elibptipbciaypebvxssshlmjhem/Build/Products/Debug-iphoneos/ObjectMapper.framework"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,7 +50,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				446BA80E1CE5D5C400449947 /* AudioQueuePlayer.framework in Frameworks */,
+				BB14124D1D38DF3C00166457 /* ObjectMapper.framework in Frameworks */,
+				BB14124A1D38DEF200166457 /* AudioQueuePlayer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,6 +61,8 @@
 		442718801CE1EAF6008428E3 = {
 			isa = PBXGroup;
 			children = (
+				BB14124C1D38DF3C00166457 /* ObjectMapper.framework */,
+				BB1412481D38DE9D00166457 /* AudioQueuePlayer.framework */,
 				4427188B1CE1EAF6008428E3 /* AudioQueuePlayerDemo */,
 				4427188A1CE1EAF6008428E3 /* Products */,
 			);
@@ -113,6 +122,7 @@
 				TargetAttributes = {
 					442718881CE1EAF6008428E3 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = JVX5SR538Q;
 					};
 				};
 			};
@@ -276,6 +286,7 @@
 				);
 				INFOPLIST_FILE = AudioQueuePlayerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.AudioQueuePlayerDemo;
 				PRODUCT_NAME = AudioQueuePlayerDemo;
 				PROVISIONING_PROFILE = "";

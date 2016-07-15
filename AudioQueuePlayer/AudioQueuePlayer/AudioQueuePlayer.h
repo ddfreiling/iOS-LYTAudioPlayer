@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
 //! Project version number for AudioQueuePlayer.
 FOUNDATION_EXPORT double AudioQueuePlayerVersionNumber;
@@ -15,4 +16,3 @@ FOUNDATION_EXPORT double AudioQueuePlayerVersionNumber;
 FOUNDATION_EXPORT const unsigned char AudioQueuePlayerVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <AudioQueuePlayer/PublicHeader.h>
-
