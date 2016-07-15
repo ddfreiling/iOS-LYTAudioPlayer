@@ -18,8 +18,8 @@ import Foundation
  Every object, that uses KVO should have its own NotificationManager.
  All observers are automatically deregistered when the object is deallocated.
  */
-public class ObserverManager : NSObject {
-    static let sharedInstance = ObserverManager()
+@objc class ObserverManager : NSObject {
+    internal static let sharedInstance = ObserverManager()
     
     // MARK: Public API
     
@@ -30,7 +30,7 @@ public class ObserverManager : NSObject {
      - parameter keyPath: The keyPath to observe
      - parameter block:   The block that is called when the value changed. Gets called with the new value.
      */
-    public func registerObserverForObject(object: NSObject, keyPath: String, block: (value: NSObject) -> ()) {
+    internal func registerObserverForObject(object: NSObject, keyPath: String, block: (value: NSObject) -> ()) {
         var closuresForKeyPaths = Dictionary<String, Array<(NSObject) -> ()>>()
         if let cfkp = closuresForKeypathsForObservedObjects[object] {
             closuresForKeyPaths = cfkp
@@ -49,7 +49,7 @@ public class ObserverManager : NSObject {
     /**
      Removes all observers that observe the given keypath on the given object.
      */
-    public func deregisterObserversForObject(object: NSObject, andKeyPath keyPath: String) {
+    internal func deregisterObserversForObject(object: NSObject, andKeyPath keyPath: String) {
         guard var closuresForKeyPaths = closuresForKeypathsForObservedObjects[object] else {
             return // No observers registered for given object and keyPath
         }
@@ -66,7 +66,7 @@ public class ObserverManager : NSObject {
     /**
      Removes all observers that observe any keypath on the given object.
      */
-    public func deregisterObserversForObject(object: NSObject) {
+    internal func deregisterObserversForObject(object: NSObject) {
         guard let closuresForKeypaths = closuresForKeypathsForObservedObjects[object] else {
             return // No observers registered for the given object
         }
@@ -81,7 +81,7 @@ public class ObserverManager : NSObject {
     /**
      Removes all observers that observe any keypath on any object.
      */
-    public func deregisterAllObservers() {
+    internal func deregisterAllObservers() {
         for (object, closuresForKeyPaths) in closuresForKeypathsForObservedObjects {
             for (keypath, _) in closuresForKeyPaths {
                 object.removeObserver(self, forKeyPath: keypath)
@@ -97,7 +97,7 @@ public class ObserverManager : NSObject {
     // rdar://19175346 (on openradar)
     private var closuresForKeypathsForObservedObjects = Dictionary<NSObject, Dictionary<String, Array<(NSObject) -> ()>>>()
     
-    override public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override internal func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         guard let keyPath = keyPath else { return }
         guard let object = object as? NSObject else { return }
         

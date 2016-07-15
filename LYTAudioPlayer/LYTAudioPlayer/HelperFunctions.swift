@@ -14,30 +14,6 @@ import UIKit
 // Convenience types and functions .......
 
 // -------------------------------------------------------------------------------------
-// MARK: - UI Related helpers
-
-/// Show an alert
-func showAlert(title: String, message: String, success: () -> () = {} ) {
-    
-    let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-    
-    alertController.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
-        NSLog("Handle Ok logic here")
-        success()
-    }))
-    
-    alertController.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (action: UIAlertAction!) in
-        NSLog("Handle Cancel Logic here")
-    }))
-    
-    let app = UIApplication.sharedApplication()
-    let viewController = app.delegate?.window??.rootViewController
-    // TODO: Aditional logic may be needed to find the visibleViewController ??
-    viewController?.presentViewController(alertController, animated: true, completion: nil)
-}
-
-
-// -------------------------------------------------------------------------------------
 // MARK: - Async utilities
 
 private let bgSerialQueue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL)

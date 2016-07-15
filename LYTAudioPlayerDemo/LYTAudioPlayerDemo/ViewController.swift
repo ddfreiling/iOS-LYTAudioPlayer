@@ -9,7 +9,7 @@
 import UIKit
 import AudioToolbox
 import AVFoundation
-import AudioQueuePlayer
+import LYTAudioPlayer
 
 // TODO: Consider alternatives to home-rolled Player
 // https://github.com/tumtumtum/StreamingKit

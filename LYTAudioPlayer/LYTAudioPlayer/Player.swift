@@ -216,7 +216,11 @@ public typealias Callback = () -> Void
             NSLog("\(#function) Invalid playlist index given: \(index)")
             return
         }
+        let wasPlaying = self.isPlaying
         self.setupCurrentPlaylistIndex(index) {
+            if (wasPlaying) {
+                self.play();
+            }
             onCompletion()
         }
     }
