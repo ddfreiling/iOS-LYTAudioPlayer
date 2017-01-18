@@ -22,7 +22,7 @@ public class AVQueuePlayerPrevious : AVQueuePlayer {
         self.init(items: [AVPlayerItem(URL: URL)])
     }
     
-    override convenience init(playerItem item: AVPlayerItem) {
+    convenience init(item: AVPlayerItem) {
         self.init(items: [item])
     }
     

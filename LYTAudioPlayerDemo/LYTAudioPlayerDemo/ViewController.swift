@@ -28,10 +28,17 @@ class ViewController: UIViewController, LYTPlayerDelegate {
         //UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
         // Do any additional setup after loading the view, typically from a nib.
         
+            }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+    // MARK: Actions
+    @IBAction func onPlayClicked(sender: UIButton) {
+        NSLog("Play Clicked")
         let myPlaylist = LYTPlaylist()
-        myPlaylist.addTrack(
-            LYTAudioTrack(url: NSURL(string:"http://www.noiseaddicts.com/samples_1w72b820/3714.mp3")!,
-                title: "Intro Sound", artist: "Artist", album: "Intro", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         myPlaylist.addTrack(
             LYTAudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-01.mp3")!,
                 title: "Skyggeforbandelsen", artist: "Helene Tegtmeier", album: "Del 1 af 3", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
@@ -43,28 +50,21 @@ class ViewController: UIViewController, LYTPlayerDelegate {
                 title: "Skyggeforbandelsen", artist: "Helene Tegtmeier", album: "Del 3 af 3", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         myPlaylist.addTrack(
             LYTAudioTrack(url: NSURL(string:"https://archive.org/download/George-Orwell-1984-Audio-book/1984-04.mp3")!,
-                title: "title", artist: "artist", album: "album", albumArtUrl: NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
-        
+                title: "title", artist: "artist", album: "album", albumArtUrl:
+                    NSURL(string:"http://bookcover.nota.dk/714070_w140_h200.jpg")))
         
         player = LYTPlayer.sharedInstance
         player.delegate = self;
-        player.loadPlaylist(myPlaylist, andAutoplay: false)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    // MARK: Actions
-    @IBAction func onPlayClicked(sender: UIButton) {
-        NSLog("Play Clicked")
-        player.play()
+        player.loadPlaylist(myPlaylist, initialPlaylistIndex: 0)
     }
     
     @IBAction func onPauseClicked(sender: UIButton) {
         NSLog("Pause Clicked")
-        player.pause()
+        if (player.isPlaying) {
+            player.pause()
+        } else {
+            player.play()
+        }
     }
     
     @IBAction func onPreviousClicked(sender: UIButton) {
@@ -107,6 +107,10 @@ class ViewController: UIViewController, LYTPlayerDelegate {
     
     func didChangeStateFrom(from: LYTPlayerState, to: LYTPlayerState) {
         NSLog("Delegate: state-change: \(from.rawValue) -> \(to.rawValue)")
+        if (to == LYTPlayerState.Ready) {
+            NSLog("ready -> Play!");
+            player.play()
+        }
     }
     func didFinishPlayingTrack(track: LYTAudioTrack) {
         NSLog("Delegate: finish item: \(track.title)")
@@ -115,7 +119,7 @@ class ViewController: UIViewController, LYTPlayerDelegate {
         NSLog("Delegate: duration found for item \(track.title) = \(duration)")
     }
     func didUpdateBufferedDuration(buffered: Double, forTrack track: LYTAudioTrack) {
-        NSLog("Delegate: buffered: \(track.title) >> \(buffered)s")
+        //NSLog("Delegate: buffered: \(track.title) >> \(buffered)s")
     }
     func didChangeToTrack(track: LYTAudioTrack) {
         NSLog("Delegate: changed current track: \(track.title)")

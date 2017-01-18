@@ -41,7 +41,7 @@ func fileURL(filename: String) -> NSURL {
     // let fileURL = documentsURL().URLByAppendingPathComponent(filename)
     // TODO: Currently we only llok for resoruces, and not file in the Documents directory....
     let fileURL = resourceURL().URLByAppendingPathComponent(filename)
-    return fileURL
+    return fileURL!
 }
 
 func fileExists(filename: String) -> Bool {

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB463CB11D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */; };
+		BB463CB21D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BBE2A8141D395225007024F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2A8131D395225007024F9 /* AppDelegate.swift */; };
 		BBE2A8161D395225007024F9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2A8151D395225007024F9 /* ViewController.swift */; };
 		BBE2A8191D395225007024F9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBE2A8171D395225007024F9 /* Main.storyboard */; };
@@ -15,12 +17,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BBE2A8281D395230007024F9 /* Embed Frameworks */ = {
+		BB463CB31D5C6AA7004EBE4B /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				BB463CB21D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -28,6 +31,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LYTAudioPlayer.framework; path = "../../../Library/Developer/Xcode/DerivedData/demo-bpvqaqfepjpeqygibsvcndcubkuh/Build/Products/Debug-iphoneos/LYTAudioPlayer.framework"; sourceTree = "<group>"; };
 		BBE2A8101D395225007024F9 /* LYTAudioPlayerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LYTAudioPlayerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE2A8131D395225007024F9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BBE2A8151D395225007024F9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -42,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB463CB11D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,6 +56,7 @@
 		BBE2A8071D395225007024F9 = {
 			isa = PBXGroup;
 			children = (
+				BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */,
 				BBE2A8121D395225007024F9 /* LYTAudioPlayerDemo */,
 				BBE2A8111D395225007024F9 /* Products */,
 			);
@@ -87,7 +93,7 @@
 				BBE2A80C1D395225007024F9 /* Sources */,
 				BBE2A80D1D395225007024F9 /* Frameworks */,
 				BBE2A80E1D395225007024F9 /* Resources */,
-				BBE2A8281D395230007024F9 /* Embed Frameworks */,
+				BB463CB31D5C6AA7004EBE4B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -105,11 +111,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = Nota;
 				TargetAttributes = {
 					BBE2A80F1D395225007024F9 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = 5H73UZQ5V6;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -190,8 +198,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -236,8 +246,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -256,6 +268,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -265,10 +278,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 5H73UZQ5V6;
 				INFOPLIST_FILE = LYTAudioPlayerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.LYTAudioPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -276,10 +291,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 5H73UZQ5V6;
 				INFOPLIST_FILE = LYTAudioPlayerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.LYTAudioPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};

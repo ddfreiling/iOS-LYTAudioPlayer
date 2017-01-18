@@ -17,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BB3E77711E2F9C7600D16DF0 /* AVQueuePlayerPrevious.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVQueuePlayerPrevious.swift; sourceTree = "<group>"; };
 		BBB1CE851D3941CD001E6E55 /* LYTAudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LYTAudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBB1CE881D3941CD001E6E55 /* LYTAudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LYTAudioPlayer.h; sourceTree = "<group>"; };
 		BBB1CE8A1D3941CD001E6E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -60,6 +61,7 @@
 		BBB1CE871D3941CD001E6E55 /* LYTAudioPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				BB3E77711E2F9C7600D16DF0 /* AVQueuePlayerPrevious.swift */,
 				BBB1CE9F1D394242001E6E55 /* AudioTrack.swift */,
 				BBB1CEA01D394242001E6E55 /* HelperFunctions.swift */,
 				BBB1CEA11D394242001E6E55 /* ObserverManager.swift */,
@@ -115,6 +117,8 @@
 				TargetAttributes = {
 					BBB1CE841D3941CD001E6E55 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = 5H73UZQ5V6;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -257,7 +261,9 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5H73UZQ5V6;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -268,6 +274,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -277,6 +284,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5H73UZQ5V6;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -286,6 +294,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.LYTAudioPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
