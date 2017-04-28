@@ -10,49 +10,73 @@ import Foundation
 import AudioToolbox
 import AVFoundation
 import MediaPlayer
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func >= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l >= r
+  default:
+    return !(lhs < rhs)
+  }
+}
+
 
 @objc public enum LYTPlayerState : UInt {
-    case Buffering = 0
-    case Playing = 1
-    case Paused = 2
-    case Stopped = 3
-    case WaitingForConnection = 4
-    case Failed = 5
-    case Ready = 6
+    case buffering = 0
+    case playing = 1
+    case paused = 2
+    case stopped = 3
+    case waitingForConnection = 4
+    case failed = 5
+    case ready = 6
 }
 extension LYTPlayerState: Equatable { }
 
 public typealias Callback = () -> Void
 
 @objc public protocol LYTPlayerDelegate: NSObjectProtocol {
-    func didChangeStateFrom( from: LYTPlayerState, to: LYTPlayerState )
-    func didFinishPlayingTrack( track: LYTAudioTrack )
-    func didFindDuration( durationSeconds: Double, forTrack track: LYTAudioTrack )
-    func didUpdateBufferedDuration( bufferedDuration: Double, forTrack track: LYTAudioTrack )
-    func didChangeToTrack( track: LYTAudioTrack )
-    func didEncounterError( error: NSError )
+    func didChangeStateFrom( _ from: LYTPlayerState, to: LYTPlayerState )
+    func didFinishPlayingTrack( _ track: LYTAudioTrack )
+    func didFindDuration( _ durationSeconds: Double, forTrack track: LYTAudioTrack )
+    func didUpdateBufferedDuration( _ bufferedDuration: Double, forTrack track: LYTAudioTrack )
+    func didChangeToTrack( _ track: LYTAudioTrack )
+    func didEncounterError( _ error: NSError )
 }
 
-@objc public class LYTPlayer : NSObject {
+@objc open class LYTPlayer : NSObject {
     
     var audioPlayer = AVQueuePlayer()
     var authorizationFailedCallback: Callback?
     var currentPlaylist: LYTPlaylist?
     
-    public var currentPlaylistIndex: Int = 0
+    open var currentPlaylistIndex: Int = 0
     
     let observerManager = ObserverManager() // For KVO - see: https://github.com/timbodeit/ObserverManager
     
-    public weak var delegate: LYTPlayerDelegate?
-    public static let sharedInstance = LYTPlayer()
+    open weak var delegate: LYTPlayerDelegate?
+    open static let sharedInstance = LYTPlayer()
     
-    private override init() {
+    fileprivate override init() {
         super.init()
-        state = .Stopped
-        audioPlayer.actionAtItemEnd = .Advance
+        state = .stopped
+        audioPlayer.actionAtItemEnd = .advance
         configureRemoteControlEvents()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LYTPlayer.audioSessionInterrupted), name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LYTPlayer.audioSessionRouteChanged), name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(LYTPlayer.audioSessionInterrupted), name: NSNotification.Name.AVAudioSessionInterruption, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(LYTPlayer.audioSessionRouteChanged), name: NSNotification.Name.AVAudioSessionRouteChange, object: AVAudioSession.sharedInstance())
     }
     
     deinit {
@@ -62,9 +86,9 @@ public typealias Callback = () -> Void
     // MARK: Readonly properties
     
     /// The current state of the player.
-    public private(set) var state = LYTPlayerState.Stopped {
+    open fileprivate(set) var state = LYTPlayerState.stopped {
         didSet {
-            if state != oldValue || state == .WaitingForConnection {
+            if state != oldValue || state == .waitingForConnection {
                 onMainQueue() {
                     self.delegate?.didChangeStateFrom(oldValue, to: self.state)
                 }
@@ -72,19 +96,19 @@ public typealias Callback = () -> Void
         }
     }
     
-    public var isPlaying: Bool {
+    open var isPlaying: Bool {
         get {
             return (audioPlayer.rate != 0.0)
         }
     }
     
-    public var currentTrack: LYTAudioTrack? {
+    open var currentTrack: LYTAudioTrack? {
         get {
             return currentPlaylist?.tracks[currentPlaylistIndex]
         }
     }
     
-    public var currentTrackDuration: Double {
+    open var currentTrackDuration: Double {
         get {
             if let item = self.audioPlayer.currentItem {
                 return item.duration.seconds
@@ -95,7 +119,7 @@ public typealias Callback = () -> Void
     }
     
     // MARK: Public API
-    public var playbackRate: Float {
+    open var playbackRate: Float {
         get {
             return audioPlayer.rate;
         }
@@ -108,7 +132,7 @@ public typealias Callback = () -> Void
         }
     }
     
-    public func loadPlaylist(playlist: LYTPlaylist, initialPlaylistIndex: Int) {
+    open func loadPlaylist(_ playlist: LYTPlaylist, initialPlaylistIndex: Int) {
         onSerialQueue() {
             self.currentPlaylist = playlist
             self.currentPlaylistIndex = initialPlaylistIndex
@@ -116,18 +140,18 @@ public typealias Callback = () -> Void
         }
     }
     
-    public func play() {
+    open func play() {
         guard let _ = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         NSLog("\(#function)...")
         
         // Verify that we are ready to play....
-        if ( audioPlayer.status == .ReadyToPlay ) {
+        if ( audioPlayer.status == .readyToPlay ) {
             NSLog("LYTPlayer is READY")
             if let status = audioPlayer.currentItem?.status {
                 switch status  {
-                case AVPlayerItemStatus.ReadyToPlay :
+                case AVPlayerItemStatus.readyToPlay :
                     NSLog("CurrentItem is READY")
-                case AVPlayerItemStatus.Failed :
+                case AVPlayerItemStatus.failed :
                     NSLog("CurrentItem FAILED")
                 default:
                     NSLog("CurrentItem is in an unknown state...")
@@ -136,7 +160,7 @@ public typealias Callback = () -> Void
                 NSLog("LYTPlayer currentItem is in trouble: \(audioPlayer.currentItem.debugDescription)")
             }
         } else {
-            NSLog("*** LYTPlayer is NOT READY : \(audioPlayer.error?.localizedDescription) ***")
+            NSLog("*** LYTPlayer is NOT READY : \(audioPlayer.error?.localizedDescription ?? "general error") ***")
             return
         }
         
@@ -144,7 +168,7 @@ public typealias Callback = () -> Void
         setupAudioActive(true)
         audioPlayer.play()
         NSLog("LYTPlayer.play() status: \(currentStatus() )")
-        state = .Playing
+        state = .playing
     }
     
     func currentStatus() -> String {
@@ -154,30 +178,30 @@ public typealias Callback = () -> Void
         return status
     }
     
-    public func pause() {
+    open func pause() {
         NSLog("\(#function)...")
         audioPlayer.pause()
         // TODO: Register where we are so can continue where we stopped.
         setupAudioActive(false)
-        state = .Paused
+        state = .paused
     }
     
-    public func stop() {
+    open func stop() {
         self.stopPlayback(true);
     }
     
-    private func stopPlayback(fullstop: Bool = false) {
+    fileprivate func stopPlayback(_ fullstop: Bool = false) {
         NSLog("\(#function)...")
         audioPlayer.pause() // AVPlayer does not have a stop method
         observerManager.deregisterAllObservers()
         audioPlayer.removeAllItems()
-        state = .Stopped
+        state = .stopped
         if (fullstop) {
             currentPlaylistIndex = 0;
         }
     }
     
-    public func nextAudioTrack(onCompletion: Callback) {
+    open func nextAudioTrack(_ onCompletion: @escaping Callback) {
         guard let currentPlaylist = self.currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         if ( self.currentPlaylistIndex + 1 < currentPlaylist.trackCount ) {
             self.stopPlayback()
@@ -193,37 +217,37 @@ public typealias Callback = () -> Void
         }
     }
     
-    public func previousAudioTrack(onCompletion: Callback) {
+    open func previousAudioTrack(_ onCompletion: @escaping Callback) {
         self.setupCurrentPlaylistIndex( max(self.currentPlaylistIndex - 1, 0) ) {
             self.play()
             onCompletion()
         }
     }
     
-    public var currentTime: Int {
+    open var currentTime: Int {
         get {
             return lround(audioPlayer.currentTime().seconds * 1000)
         }
     }
     
-    public func seekToTimeMilis(timeMilis: Int, onCompletion: Callback) {
+    open func seekToTimeMilis(_ timeMilis: Int, onCompletion: @escaping Callback) {
         
-        if (self.audioPlayer.currentItem == nil || self.audioPlayer.currentItem?.status != .ReadyToPlay) {
+        if (self.audioPlayer.currentItem == nil || self.audioPlayer.currentItem?.status != .readyToPlay) {
             return
         }
         
         onSerialQueue() {
             let newTime: CMTime = CMTimeMake(Int64(timeMilis), 1000)
-            self.audioPlayer.seekToTime(newTime) { success in
+            self.audioPlayer.seek(to: newTime, completionHandler: { success in
                 self.updateNowPlayingInfo()
                 onMainQueue() {
                     onCompletion()
                 }
-            }
+            }) 
         }
     }
     
-    public func skipToPlaylistIndex(index: Int, onCompletion: Callback) {
+    open func skipToPlaylistIndex(_ index: Int, onCompletion: @escaping Callback) {
         if (index < 0 || index >= self.currentPlaylist?.trackCount) {
             NSLog("\(#function) Invalid playlist index given: \(index)")
             return
@@ -245,12 +269,12 @@ public typealias Callback = () -> Void
     // MARK: Private
     
     // Return true if succesful.
-    func setupAudioActive(active: Bool) -> Bool {
+    func setupAudioActive(_ active: Bool) -> Bool {
         NSLog("\(#function)( \(active) )...")
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(AVAudioSessionCategoryPlayback)
-            try audioSession.setActive(active, withOptions: .NotifyOthersOnDeactivation ) // ??? Options
+            try audioSession.setActive(active, with: .notifyOthersOnDeactivation ) // ??? Options
             return true
         } catch {
             NSLog("Error setting AudioSession !!!!!!!!!")
@@ -260,13 +284,13 @@ public typealias Callback = () -> Void
     }
     
     func resetPlayer() {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
         audioPlayer.pause()
         audioPlayer.removeAllItems()
         setupAudioActive(false)
     }
     
-    func setupCurrentPlaylistIndex(playlistIndex: Int, onComplete: () -> () = {} ) {
+    func setupCurrentPlaylistIndex(_ playlistIndex: Int, onComplete: @escaping () -> () = {} ) {
         onSerialQueue() {
             guard let _ = self.currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
             NSLog("setupCurrentAudioPart(\(playlistIndex)) ...")
@@ -282,28 +306,28 @@ public typealias Callback = () -> Void
     }
     
     // Adds a player item for a given playlist index to the play queue, and setup observers to automatically schedule the next.
-    func addItemToPlayerQueue( playlistIndex: Int ) {
+    func addItemToPlayerQueue( _ playlistIndex: Int ) {
         guard let currentPlaylist = currentPlaylist else { NSLog("NO currentPlaylist in \(#function)"); return }
         let track = currentPlaylist.tracks[playlistIndex]
         NSLog("Add to Queue: \(track.url.lastPathComponent) from URL: \(track.url)")
-        let asset = AVURLAsset(URL: track.url)
+        let asset = AVURLAsset(url: track.url as URL)
         let item = AVPlayerItem.init(asset: asset, automaticallyLoadedAssetKeys: ["duration","playable","tracks"]) // Asset keys that need to be present before the item is considered 'ready'
         self.setupPlayerItemObservers(item, itemPlaylistIndex: playlistIndex)
-        self.audioPlayer.insertItem(item, afterItem: nil) // append item to player queue
+        self.audioPlayer.insert(item, after: nil) // append item to player queue
     }
     
-    func setupPlayerItemObservers(item: AVPlayerItem, itemPlaylistIndex: Int) {
-        NSNotificationCenter.defaultCenter()
-            .addObserver(self, selector: #selector(finishedPlayingItem), name: AVPlayerItemDidPlayToEndTimeNotification, object: item)
+    func setupPlayerItemObservers(_ item: AVPlayerItem, itemPlaylistIndex: Int) {
+        NotificationCenter.default
+            .addObserver(self, selector: #selector(finishedPlayingItem), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
         let itemTrack: LYTAudioTrack = self.currentPlaylist!.tracks[itemPlaylistIndex]
         item.whenChanging("status", manager: observerManager ) { item in
             switch item.status {
-            case .Failed:
+            case .failed:
                 NSLog("--> PlayerItem FAILED: \(item.asset.debugDescription)")
                 //TODO: Handle this. resubmit?
-            case .ReadyToPlay:
+            case .readyToPlay:
                 NSLog("--> PlayerItem READY: \(item.asset.debugDescription)")
-                self.state = .Ready
+                self.state = .ready
                 let nextPlaylistIndex = itemPlaylistIndex + 1
                 if (nextPlaylistIndex < self.currentPlaylist?.trackCount) {
                     self.addItemToPlayerQueue(nextPlaylistIndex)
@@ -311,13 +335,13 @@ public typealias Callback = () -> Void
                 onMainQueue({
                     self.delegate?.didFindDuration(item.duration.seconds, forTrack: itemTrack)
                 })
-            case .Unknown :
+            case .unknown :
                 NSLog("--> PlayerItem UNKNOWN status: \(item.asset.debugDescription)")
             }
             
             if let error = item.error {
-                NSLog("--- Item Error: \(error.localizedDescription) reason: \(error.localizedFailureReason) - UserInfo: \(error.userInfo.debugDescription)")
-                if ( error.code == NSURLErrorUserAuthenticationRequired ) { // Error codes: http://nshipster.com/nserror/
+                NSLog("--- Item Error: \(error.localizedDescription) reason: \(error.localizedDescription) - UserInfo: \(error._userInfo.debugDescription)")
+                if ( error._code == NSURLErrorUserAuthenticationRequired ) { // Error codes: http://nshipster.com/nserror/
                     NSLog("*** Authentication Required !!!! ***")
                     // TODO: Callback to UI ? Deal with Authentication .....
                     // TODO: Remember where we where. Check if something is playing? (then what??)
@@ -327,7 +351,7 @@ public typealias Callback = () -> Void
                     NSLog("*** UNHANDLED ERROR !!!! ***")
                     // TODO: Deal with other item errors .......
                     onMainQueue({
-                        self.delegate?.didEncounterError(error)
+                        self.delegate?.didEncounterError(error as NSError)
                     })
                 }
             }
@@ -341,13 +365,13 @@ public typealias Callback = () -> Void
         }
         item.whenChanging("playbackBufferEmpty", manager: observerManager) { item in
             NSLog("====================== Buffer empty for index \(itemPlaylistIndex)");
-            self.state = .Buffering
+            self.state = .buffering
         }
     }
     
-    func durationLoadedOfItem(item: AVPlayerItem) -> Double {
+    func durationLoadedOfItem(_ item: AVPlayerItem) -> Double {
         //NSLog("-> Item has \(item.loadedTimeRanges.count) time ranges");
-        let timeRange: CMTimeRange = item.loadedTimeRanges[0].CMTimeRangeValue
+        let timeRange: CMTimeRange = item.loadedTimeRanges[0].timeRangeValue
         let loadedDuration: Double = CMTimeGetSeconds(timeRange.duration)
         return loadedDuration
     }
@@ -370,30 +394,30 @@ public typealias Callback = () -> Void
         let currentTrack: LYTAudioTrack = currentPlaylist.tracks[currentPlaylistIndex]
         
         NSLog("Updating NowPlayingInfo for: \(currentTrack.title)")
-        let infoCenter = MPNowPlayingInfoCenter.defaultCenter()
+        let infoCenter = MPNowPlayingInfoCenter.default()
         var info = [String: AnyObject]()
-        info[MPMediaItemPropertyMediaType] = MPMediaType.AudioBook.rawValue // Not sure we need this, or what it does....
-        info[MPMediaItemPropertyAlbumArtist] = currentTrack.artist
-        info[MPMediaItemPropertyAlbumTitle] = currentTrack.album
-        info[MPMediaItemPropertyTitle] = currentTrack.title
-        info[MPNowPlayingInfoPropertyChapterNumber] = self.currentPlaylistIndex + 1
-        info[MPNowPlayingInfoPropertyChapterCount] = currentPlaylist.trackCount
-        info[MPMediaItemPropertyAlbumTrackNumber] = self.currentPlaylistIndex + 1
-        info[MPNowPlayingInfoPropertyPlaybackRate] = self.audioPlayer.rate
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = self.audioPlayer.currentItem?.currentTime().seconds
-        info[MPMediaItemPropertyPlaybackDuration] = self.audioPlayer.currentItem?.duration.seconds
+        info[MPMediaItemPropertyMediaType] = MPMediaType.audioBook.rawValue as AnyObject // Not sure we need this, or what it does....
+        info[MPMediaItemPropertyAlbumArtist] = currentTrack.artist as AnyObject
+        info[MPMediaItemPropertyAlbumTitle] = currentTrack.album as AnyObject
+        info[MPMediaItemPropertyTitle] = currentTrack.title as AnyObject
+        info[MPNowPlayingInfoPropertyChapterNumber] = self.currentPlaylistIndex + 1 as AnyObject
+        info[MPNowPlayingInfoPropertyChapterCount] = currentPlaylist.trackCount as AnyObject
+        info[MPMediaItemPropertyAlbumTrackNumber] = self.currentPlaylistIndex + 1 as AnyObject
+        info[MPNowPlayingInfoPropertyPlaybackRate] = self.audioPlayer.rate as AnyObject
+        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = self.audioPlayer.currentItem?.currentTime().seconds as AnyObject
+        info[MPMediaItemPropertyPlaybackDuration] = self.audioPlayer.currentItem?.duration.seconds as AnyObject
         if let artImage = currentTrack.albumArtCachedImage {
             info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(image: artImage)
         }
         infoCenter.nowPlayingInfo = info
         
         // Set artwork image async
-        guard let imageUrl = currentTrack.albumArtUrl where currentTrack.albumArtCachedImage == nil else {
+        guard let imageUrl = currentTrack.albumArtUrl, currentTrack.albumArtCachedImage == nil else {
             NSLog("==> No album artwork url specified or already cached")
             return
         }
         onSerialQueue({
-            guard let artworkImageData = NSData(contentsOfURL: imageUrl),
+            guard let artworkImageData = try? Data(contentsOf: imageUrl),
                 let artworkImage = UIImage(data: artworkImageData) else {
                     NSLog("Error downloading artwork image from: \(imageUrl.absoluteString)")
                     return
@@ -409,9 +433,9 @@ public typealias Callback = () -> Void
         })
     }
     
-    func getArtworkImageFromUrl(imageUrlPath: String) -> UIImage? {
-        guard let imageUrl = NSURL(string: imageUrlPath),
-            let artworkImageData = NSData(contentsOfURL: imageUrl),
+    func getArtworkImageFromUrl(_ imageUrlPath: String) -> UIImage? {
+        guard let imageUrl = URL(string: imageUrlPath),
+            let artworkImageData = try? Data(contentsOf: imageUrl),
             let artworkImage = UIImage(data: artworkImageData) else {
                 NSLog("Error downloading artwork image from path: \(imageUrlPath)")
                 return nil
@@ -427,7 +451,7 @@ public typealias Callback = () -> Void
     // Setup Observers for AVQueuePlayer
     func setupAudioPlayerObservers() {
         audioPlayer.whenChanging("currentItem", manager: observerManager) { player in
-            NSLog("==> AudioPlayer new current item \(player.currentItem?.asset.debugDescription)")
+            NSLog("==> AudioPlayer new current item \(player.currentItem?.asset.debugDescription ?? "general error")")
             self.updateNowPlayingInfo()
             if let currentTrack: LYTAudioTrack = self.currentPlaylist?.tracks[self.currentPlaylistIndex] {
                 onMainQueue({
@@ -437,13 +461,13 @@ public typealias Callback = () -> Void
         }
         audioPlayer.whenChanging("status", manager: observerManager) { player in
             switch(player.status) {
-            case .ReadyToPlay :
+            case .readyToPlay :
                 NSLog("+++ LYTPlayer is ready to play!")
-                self.state = .Ready
-            case .Failed :
+                self.state = .ready
+            case .failed :
                 NSLog("*** LYTPlayer Failed!")
-                self.state = .Failed
-            case .Unknown :
+                self.state = .failed
+            case .unknown :
                 NSLog("??? LYTPlayer is in UNKNOWN state ???")
             }
             
@@ -460,10 +484,10 @@ public typealias Callback = () -> Void
         observerManager.deregisterObserversForObject(audioPlayer)
     }
     
-    private var pausedByAudioSessionInterrupt = false
+    fileprivate var pausedByAudioSessionInterrupt = false
     
     // Called whenever we get interrupted (by f.ex. phone call, Alarm clock, etc.)
-    func audioSessionInterrupted(notification: NSNotification)
+    func audioSessionInterrupted(_ notification: Notification)
     {
         guard let interruptTypeRaw = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
             let interruptType = AVAudioSessionInterruptionType(rawValue: interruptTypeRaw) else {
@@ -473,11 +497,11 @@ public typealias Callback = () -> Void
         NSLog("*** AVAudioSessionInterruption: \(interruptType)")
         
         switch interruptType {
-        case .Began:
+        case .began:
             pausedByAudioSessionInterrupt = true
             self.pause()
             break
-        case .Ended:
+        case .ended:
             if (!self.isPlaying && pausedByAudioSessionInterrupt) {
                 self.play()
                 pausedByAudioSessionInterrupt = false
@@ -488,7 +512,7 @@ public typealias Callback = () -> Void
     
     // Called whenever the audio route is changed (f.ex. switch to headset og AirPlay)
     // https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/HandlingAudioHardwareRouteChanges/HandlingAudioHardwareRouteChanges.html#//apple_ref/doc/uid/TP40007875-CH5-SW1
-    func audioSessionRouteChanged(notification: NSNotification)
+    func audioSessionRouteChanged(_ notification: Notification)
     {
         // Unplug headset should pause audio (according to Apple HIG)
         guard let routeChangeRaw = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
@@ -498,7 +522,7 @@ public typealias Callback = () -> Void
         }
         NSLog("*** AVAudioSessionRouteChange: \(routeChange)")
         
-        if (routeChange != .CategoryChange) {
+        if (routeChange != .categoryChange) {
             self.pause()
         }
     }
@@ -512,49 +536,49 @@ public typealias Callback = () -> Void
     //       still work via f.ex.  the headset remote controll events (if applicable)
     func configureRemoteControlEvents() {
         NSLog("\(#function)...")
-        let commandCenter = MPRemoteCommandCenter.sharedCommandCenter()
-        commandCenter.playCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.playCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("playCommand")
             self.play()
-            return .Success
-        }
-        commandCenter.pauseCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+            return .success
+        })
+        commandCenter.pauseCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("pauseCommand")
             self.pause()
-            return .Success
-        }
+            return .success
+        })
         // Headset remote sends this signal on single click .....
-        commandCenter.togglePlayPauseCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+        commandCenter.togglePlayPauseCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("togglePlayPauseCommand \(event.description)")
             if ( self.isPlaying ) {
                 self.pause()
             } else {
                 self.play()
             }
-            return .Success
-        }
+            return .success
+        })
         
-        commandCenter.previousTrackCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+        commandCenter.previousTrackCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("previousTrackCommand \(event.description)")
             self.previousAudioTrack() {}
-            return .Success
-        }
-        commandCenter.previousTrackCommand.enabled = true
+            return .success
+        })
+        commandCenter.previousTrackCommand.isEnabled = true
         
         // Can be sent by double-clicking on the headset remote
-        commandCenter.nextTrackCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+        commandCenter.nextTrackCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("nextTrackCommand \(event.description)")
             self.nextAudioTrack() {}
-            return .Success
-        }
-        commandCenter.nextTrackCommand.enabled = true
+            return .success
+        })
+        commandCenter.nextTrackCommand.isEnabled = true
         
         // Currently unsure what can send this ????
-        commandCenter.changePlaybackRateCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+        commandCenter.changePlaybackRateCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
             NSLog("changePlaybackRateCommand \(event.description)")
-            return .Success
-        }
-        commandCenter.changePlaybackRateCommand.enabled = true
+            return .success
+        })
+        commandCenter.changePlaybackRateCommand.isEnabled = true
         commandCenter.changePlaybackRateCommand.supportedPlaybackRates = [ 0.5, 1.0, 1.5, 2.0 ]
         
         
@@ -590,11 +614,11 @@ public typealias Callback = () -> Void
          */
         
         if #available(iOS 9.1, *) {
-            commandCenter.changePlaybackPositionCommand.addTargetWithHandler { (event) -> MPRemoteCommandHandlerStatus in
+            commandCenter.changePlaybackPositionCommand.addTarget (handler: { (event) -> MPRemoteCommandHandlerStatus in
                 NSLog("changePlaybackPositionCommand \(event.description)")
-                return .Success
-            }
-            commandCenter.changePlaybackPositionCommand.enabled = true
+                return .success
+            })
+            commandCenter.changePlaybackPositionCommand.isEnabled = true
         }
         
         // Command center has a build in bookmark function. Do we want to use that? If we enable it, there are apparently not room for previous/next track

@@ -30,7 +30,7 @@ import Foundation
      - parameter keyPath: The keyPath to observe
      - parameter block:   The block that is called when the value changed. Gets called with the new value.
      */
-    internal func registerObserverForObject(object: NSObject, keyPath: String, block: (value: NSObject) -> ()) {
+    internal func registerObserverForObject(_ object: NSObject, keyPath: String, block: @escaping (_ value: NSObject) -> ()) {
         var closuresForKeyPaths = Dictionary<String, Array<(NSObject) -> ()>>()
         if let cfkp = closuresForKeypathsForObservedObjects[object] {
             closuresForKeyPaths = cfkp
@@ -43,13 +43,13 @@ import Foundation
         closuresForKeyPaths[keyPath] = closures
         closuresForKeypathsForObservedObjects[object] = closuresForKeyPaths
         
-        object.addObserver(self, forKeyPath: keyPath, options: .New, context: nil)
+        object.addObserver(self, forKeyPath: keyPath, options: .new, context: nil)
     }
     
     /**
      Removes all observers that observe the given keypath on the given object.
      */
-    internal func deregisterObserversForObject(object: NSObject, andKeyPath keyPath: String) {
+    internal func deregisterObserversForObject(_ object: NSObject, andKeyPath keyPath: String) {
         guard var closuresForKeyPaths = closuresForKeypathsForObservedObjects[object] else {
             return // No observers registered for given object and keyPath
         }
@@ -66,7 +66,7 @@ import Foundation
     /**
      Removes all observers that observe any keypath on the given object.
      */
-    internal func deregisterObserversForObject(object: NSObject) {
+    internal func deregisterObserversForObject(_ object: NSObject) {
         guard let closuresForKeypaths = closuresForKeypathsForObservedObjects[object] else {
             return // No observers registered for the given object
         }
@@ -88,16 +88,16 @@ import Foundation
             }
         }
         
-        closuresForKeypathsForObservedObjects.removeAll(keepCapacity: false)
+        closuresForKeypathsForObservedObjects.removeAll(keepingCapacity: false)
     }
     
     // MARK: Private Logic
     
     // Using old declaration Dictionary<a,b> instead of [a:b]
     // rdar://19175346 (on openradar)
-    private var closuresForKeypathsForObservedObjects = Dictionary<NSObject, Dictionary<String, Array<(NSObject) -> ()>>>()
+    fileprivate var closuresForKeypathsForObservedObjects = Dictionary<NSObject, Dictionary<String, Array<(NSObject) -> ()>>>()
     
-    override internal func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override internal func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         guard let keyPath = keyPath else { return }
         guard let object = object as? NSObject else { return }
         
@@ -131,7 +131,7 @@ import MediaPlayer
 
 typealias QueuePlayerObserver = (AVQueuePlayer) -> ()
 extension AVQueuePlayer {
-    func whenChanging(property: String, manager: ObserverManager = ObserverManager.sharedInstance, then callback: QueuePlayerObserver ) {
+    func whenChanging(_ property: String, manager: ObserverManager = ObserverManager.sharedInstance, then callback: @escaping QueuePlayerObserver ) {
         
         manager.registerObserverForObject(self, keyPath: property) {
             (obj : NSObject?) in
@@ -148,7 +148,7 @@ extension AVQueuePlayer {
 
 typealias PlayerItemObserver = (AVPlayerItem) -> ()
 extension AVPlayerItem {
-    func whenChanging(property: String, manager: ObserverManager = ObserverManager.sharedInstance, then callback: PlayerItemObserver ) {
+    func whenChanging(_ property: String, manager: ObserverManager = ObserverManager.sharedInstance, then callback: @escaping PlayerItemObserver ) {
         
         manager.registerObserverForObject(self, keyPath: property) {
             (obj : NSObject?) in

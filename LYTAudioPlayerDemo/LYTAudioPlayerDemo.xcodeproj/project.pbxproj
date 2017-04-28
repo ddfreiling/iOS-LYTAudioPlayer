@@ -7,23 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BB463CB11D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */; };
-		BB463CB21D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BBE2A8141D395225007024F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2A8131D395225007024F9 /* AppDelegate.swift */; };
 		BBE2A8161D395225007024F9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2A8151D395225007024F9 /* ViewController.swift */; };
 		BBE2A8191D395225007024F9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBE2A8171D395225007024F9 /* Main.storyboard */; };
 		BBE2A81B1D395225007024F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBE2A81A1D395225007024F9 /* Assets.xcassets */; };
 		BBE2A81E1D395225007024F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBE2A81C1D395225007024F9 /* LaunchScreen.storyboard */; };
+		BBFC9B111EB371FA0073DA24 /* LYTAudioPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFC9B101EB371FA0073DA24 /* LYTAudioPlayer.framework */; };
+		BBFC9B121EB371FA0073DA24 /* LYTAudioPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BBFC9B101EB371FA0073DA24 /* LYTAudioPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BB463CB31D5C6AA7004EBE4B /* Embed Frameworks */ = {
+		BBFC9B131EB371FA0073DA24 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BB463CB21D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Embed Frameworks */,
+				BBFC9B121EB371FA0073DA24 /* LYTAudioPlayer.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -39,6 +39,7 @@
 		BBE2A81A1D395225007024F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BBE2A81D1D395225007024F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BBE2A81F1D395225007024F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBFC9B101EB371FA0073DA24 /* LYTAudioPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LYTAudioPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,7 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB463CB11D5C6AA7004EBE4B /* LYTAudioPlayer.framework in Frameworks */,
+				BBFC9B111EB371FA0073DA24 /* LYTAudioPlayer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +57,7 @@
 		BBE2A8071D395225007024F9 = {
 			isa = PBXGroup;
 			children = (
+				BBFC9B101EB371FA0073DA24 /* LYTAudioPlayer.framework */,
 				BB463CAC1D5C6A91004EBE4B /* LYTAudioPlayer.framework */,
 				BBE2A8121D395225007024F9 /* LYTAudioPlayerDemo */,
 				BBE2A8111D395225007024F9 /* Products */,
@@ -93,7 +95,7 @@
 				BBE2A80C1D395225007024F9 /* Sources */,
 				BBE2A80D1D395225007024F9 /* Frameworks */,
 				BBE2A80E1D395225007024F9 /* Resources */,
-				BB463CB31D5C6AA7004EBE4B /* Embed Frameworks */,
+				BBFC9B131EB371FA0073DA24 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -117,7 +119,7 @@
 					BBE2A80F1D395225007024F9 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 5H73UZQ5V6;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0830;
 					};
 				};
 			};
@@ -283,7 +285,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.LYTAudioPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -296,7 +298,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dk.nota.lyt.LYTAudioPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

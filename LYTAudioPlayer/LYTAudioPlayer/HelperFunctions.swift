@@ -16,19 +16,19 @@ import UIKit
 // -------------------------------------------------------------------------------------
 // MARK: - Async utilities
 
-private let bgSerialQueue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL)
+private let bgSerialQueue = DispatchQueue(label: "serial-worker", attributes: [])
 /// Run a function/closeure on a backround serial queue.
-func onSerialQueue( closure: () -> () ) {
-    dispatch_async(bgSerialQueue) {
+func onSerialQueue( _ closure: @escaping () -> () ) {
+    bgSerialQueue.async {
         closure()
     }
 }
 /// Run a function/closeure on the main (UI) queue. If we are already on the main thread then just run the function/closure.
-func onMainQueue( closure: () -> () ) {
-    if (NSThread.isMainThread()) {
+func onMainQueue( _ closure: @escaping () -> () ) {
+    if (Thread.isMainThread) {
         closure()
     } else {
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             closure()
         }
     }
@@ -37,42 +37,42 @@ func onMainQueue( closure: () -> () ) {
 // -------------------------------------------------------------------------------------
 // MARK: - Filesystem and URL utilities
 
-func fileURL(filename: String) -> NSURL {
+func fileURL(_ filename: String) -> URL {
     // let fileURL = documentsURL().URLByAppendingPathComponent(filename)
     // TODO: Currently we only llok for resoruces, and not file in the Documents directory....
-    let fileURL = resourceURL().URLByAppendingPathComponent(filename)
-    return fileURL!
+    let fileURL = resourceURL().appendingPathComponent(filename)
+    return fileURL
 }
 
-func fileExists(filename: String) -> Bool {
+func fileExists(_ filename: String) -> Bool {
     let url = fileURL(filename)
     let path = url.path
-    let exists = NSFileManager.defaultManager().fileExistsAtPath(path!)
+    let exists = FileManager.default.fileExists(atPath: path)
     return exists
 }
 
-func readFile(filename: String) throws -> String {
-    let contentString = try String(contentsOfURL: fileURL(filename), encoding: NSUTF8StringEncoding)
+func readFile(_ filename: String) throws -> String {
+    let contentString = try String(contentsOf: fileURL(filename), encoding: String.Encoding.utf8)
     return contentString
 }
 
-func documentsURL() -> NSURL {
-    let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+func documentsURL() -> URL {
+    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     return documentsURL
 }
 
-func resourceURL() -> NSURL {
-    return NSURL.fileURLWithPath(resourcePath())
+func resourceURL() -> URL {
+    return URL(fileURLWithPath: resourcePath())
 }
 
 func resourcePath() -> String {
-    let path = NSBundle.mainBundle().resourcePath!
+    let path = Bundle.main.resourcePath!
     return path
 }
 
-func debugDumpDir(dir: String) {
+func debugDumpDir(_ dir: String) {
     NSLog("Dump \(dir)")
-    let files = try! NSFileManager.defaultManager().contentsOfDirectoryAtPath(dir)
+    let files = try! FileManager.default.contentsOfDirectory(atPath: dir)
     NSLog("- files : \(files)")
 }
 
@@ -86,18 +86,18 @@ func debugDumpDir(dir: String) {
 //
 
 
-infix operator =~ {}
+infix operator =~
 
 func =~ (value : String, pattern : String) -> RegexMatchResult {
     let nsstr = value as NSString // we use this to access the NSString methods like .length and .substringWithRange(NSRange)
-    let options : NSRegularExpressionOptions = []
+    let options : NSRegularExpression.Options = []
     do {
         let re = try  NSRegularExpression(pattern: pattern, options: options)
         let all = NSRange(location: 0, length: nsstr.length)
         var matches : Array<String> = []
-        re.enumerateMatchesInString(value, options: [], range: all) { (result, flags, ptr) -> Void in
+        re.enumerateMatches(in: value, options: [], range: all) { (result, flags, ptr) -> Void in
             guard let result = result else { return }
-            let string = nsstr.substringWithRange(result.range)
+            let string = nsstr.substring(with: result.range)
             matches.append(string)
         }
         return RegexMatchResult(items: matches)
@@ -106,7 +106,7 @@ func =~ (value : String, pattern : String) -> RegexMatchResult {
     }
 }
 
-struct RegexMatchCaptureGenerator : GeneratorType {
+struct RegexMatchCaptureGenerator : IteratorProtocol {
     var items: ArraySlice<String>
     mutating func next() -> String? {
         if items.isEmpty { return nil }
@@ -116,9 +116,9 @@ struct RegexMatchCaptureGenerator : GeneratorType {
     }
 }
 
-struct RegexMatchResult : SequenceType, BooleanType {
+struct RegexMatchResult : Sequence {
     var items: Array<String>
-    func generate() -> RegexMatchCaptureGenerator {
+    func makeIterator() -> RegexMatchCaptureGenerator {
         return RegexMatchCaptureGenerator(items: items[0..<items.count])
     }
     var boolValue: Bool {

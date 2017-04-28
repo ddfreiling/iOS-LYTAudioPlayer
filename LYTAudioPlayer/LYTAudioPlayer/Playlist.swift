@@ -8,19 +8,19 @@
 
 import Foundation
 
-@objc public class LYTPlaylist : NSObject {
+@objc open class LYTPlaylist : NSObject {
     
-    public var tracks: [LYTAudioTrack] = [LYTAudioTrack]()
+    open var tracks: [LYTAudioTrack] = [LYTAudioTrack]()
     
     public override init() {
         
     }
     
-    public func addTrack(audioTrack: LYTAudioTrack) {
+    open func addTrack(_ audioTrack: LYTAudioTrack) {
         tracks.append(audioTrack)
     }
     
-    public var trackCount: Int {
+    open var trackCount: Int {
         get {
             return tracks.count
         }

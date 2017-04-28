@@ -8,16 +8,16 @@
 
 import Foundation
 
-@objc public class LYTAudioTrack : NSObject {
+@objc open class LYTAudioTrack : NSObject {
     
-    public var url: NSURL
-    public var title: String
-    public var artist: String
-    public var album: String
-    public var albumArtUrl: NSURL?
-    public var albumArtCachedImage: UIImage? // for storing once downloaded
+    open var url: URL
+    open var title: String
+    open var artist: String
+    open var album: String
+    open var albumArtUrl: URL?
+    open var albumArtCachedImage: UIImage? // for storing once downloaded
     
-    public init(url: NSURL, title: String, artist: String, album: String, albumArtUrl: NSURL?) {
+    public init(url: URL, title: String, artist: String, album: String, albumArtUrl: URL?) {
         self.url = url
         self.title = title
         self.artist = artist
